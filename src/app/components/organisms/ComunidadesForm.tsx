@@ -7,12 +7,18 @@ import RetosForm from "./RetosForm";
 import Select from "../atoms/Select";
 import { useComunidadesStore } from "@/app/store/useComunidadesStore";
 import { useComunidadesFormStore } from "@/app/store/useComunidadFormStore";
-import { useCreateComunidad } from "@/app/api/queries/comunidades";
+import {
+  useCreateComunidad,
+  useEditarComunidad,
+} from "@/app/api/queries/comunidades";
 import { toast } from "sonner";
-import { Comunidad } from "@/app/types/comunidades";
 import { EstadoGeneral } from "@/app/types/enums";
 
-export default function ComunidadesForm() {
+interface ComunidadesFormProps {
+  mode: "create" | "edit";
+}
+
+export default function ComunidadesForm({ mode }: ComunidadesFormProps) {
   const { estados } = useComunidadesStore();
   const {
     formData,
@@ -27,8 +33,9 @@ export default function ComunidadesForm() {
     removeLink,
   } = useComunidadesFormStore();
 
-  // Hook de mutación de React Query
+  // Hooks de mutación de React Query
   const crearComunidadMutation = useCreateComunidad();
+  const editarComunidadMutation = useEditarComunidad();
 
   const handleImageLinkClick = () => {
     const esUrlImagenValida = (url: string) => {
@@ -99,6 +106,7 @@ export default function ComunidadesForm() {
     try {
       // Preparar datos para enviar
       const comunidadData = {
+        com_id: formData.id ?? null,
         com_nombre: formData.titulo,
         com_descripcion: formData.descripcion,
         com_status: formData.estado as EstadoGeneral,
@@ -115,6 +123,7 @@ export default function ComunidadesForm() {
             ContenidoAdicionalComunidades: formData.links
               .filter((link) => link.titulo.trim() || link.link.trim()) // Solo incluir links con datos
               .map((link) => ({
+                cac_id: link.linkId ?? undefined,
                 cac_titulo: link.titulo,
                 cac_subtitulo: link.subtitulo,
                 cac_imr_url: link.imagen,
@@ -125,13 +134,19 @@ export default function ComunidadesForm() {
       };
 
       // Llamar a la mutación
-      await crearComunidadMutation.mutateAsync(comunidadData);
+      mode === "create"
+        ? await crearComunidadMutation.mutateAsync(comunidadData)
+        : await editarComunidadMutation.mutateAsync(comunidadData);
 
-      toast.success("Comunidad creada exitosamente");
+      mode === "create"
+        ? toast.success("Comunidad creada exitosamente")
+        : toast.success("Comunidad editada exitosamente");
       resetForm();
     } catch (error: any) {
       console.warn("Error creating community:", error);
-      toast.error("Error al crear la comunidad. Inténtalo de nuevo.");
+      mode === "create"
+        ? toast.error("Error al crear la comunidad. Inténtalo de nuevo.")
+        : toast.error("Error al editar la comunidad. Inténtalo de nuevo.");
     } finally {
       setSubmitting(false);
     }

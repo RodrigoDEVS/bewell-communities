@@ -4,6 +4,7 @@ import { Pencil, ImageIcon, Loader2 } from "lucide-react";
 import { useComunidadesStore } from "@/app/store/useComunidadesStore";
 import { useComunidades } from "@/app/api/queries/comunidades";
 import { useRouter } from "next/navigation";
+import { Comunidad } from "@/app/types/comunidades";
 
 export default function ComunidadesTable() {
   const router = useRouter();
@@ -11,8 +12,13 @@ export default function ComunidadesTable() {
   const { data: comunidades, isLoading, error } = useComunidades();
 
   // Accedemos al store de comunidades para las funciones de selección y acciones
-  const { selectedRows, selectAll, toggleSelectAll, toggleSelectRow } =
-    useComunidadesStore();
+  const {
+    selectedRows,
+    selectAll,
+    toggleSelectAll,
+    toggleSelectRow,
+    setSelectedCommunity,
+  } = useComunidadesStore();
 
   // Si está cargando, mostramos un spinner
   if (isLoading) {
@@ -43,9 +49,9 @@ export default function ComunidadesTable() {
     );
   }
 
-  const handleEditComunidad = (id: number) => {
-    console.log(id);
-    router.push("/contenido/comunidades/crear");
+  const handleEditComunidad = (comunidad: Comunidad) => {
+    setSelectedCommunity(comunidad);
+    router.push(`/contenido/comunidades/editar`);
   };
 
   return (
@@ -113,8 +119,8 @@ export default function ComunidadesTable() {
                   <input
                     type="checkbox"
                     className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                    checked={selectedRows.includes(comunidad.com_id)}
-                    onChange={() => toggleSelectRow(comunidad.com_id)}
+                    checked={selectedRows.includes(comunidad.com_id!)}
+                    onChange={() => toggleSelectRow(comunidad.com_id!)}
                   />
                 </div>
               </td>
@@ -150,7 +156,7 @@ export default function ComunidadesTable() {
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                 <button
-                  onClick={() => handleEditComunidad(comunidad.com_id)}
+                  onClick={() => handleEditComunidad(comunidad)}
                   className="text-gray-400 hover:text-gray-600 inline-flex items-center"
                 >
                   <Pencil className="h-4 w-4 mr-1" />

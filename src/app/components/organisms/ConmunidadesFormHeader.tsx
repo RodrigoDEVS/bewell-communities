@@ -5,7 +5,13 @@ import Button from "../atoms/Button";
 import { Download } from "lucide-react";
 import { useComunidadesFormStore } from "@/app/store/useComunidadFormStore";
 
-export default function ConmunidadesFormHeader() {
+interface ComunidadesFormHeaderProps {
+  mode: "create" | "edit";
+}
+
+export default function ConmunidadesFormHeader({
+  mode,
+}: ComunidadesFormHeaderProps) {
   const { isSubmitting } = useComunidadesFormStore();
   return (
     <div className="flex-1 p-8">
@@ -18,10 +24,12 @@ export default function ConmunidadesFormHeader() {
         </div>
         <div className="flex space-x-4">
           {/* Botón de descargar */}
-          <Button variant="outline" size="medium">
-            <Download className="w-5 h-5" />
-            <span>Descargar información</span>
-          </Button>
+          {mode === "edit" && (
+            <Button variant="outline" size="medium">
+              <Download className="w-5 h-5" />
+              <span>Descargar información</span>
+            </Button>
+          )}
 
           {/* Botón nuevo */}
           <Button

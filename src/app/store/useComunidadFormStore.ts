@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { EstadoGeneral } from "../types/enums";
 
 interface FormData {
+  id?: number | null;
   titulo: string;
   descripcion: string;
   descripcionCorta: string;
@@ -17,6 +18,8 @@ interface FormData {
 
 interface LinkData {
   id?: string;
+  linkId?: number | null;
+  comId?: number | null;
   titulo: string;
   subtitulo: string;
   imagen: string;

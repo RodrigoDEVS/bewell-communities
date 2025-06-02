@@ -1,7 +1,7 @@
 import { EstadoGeneral } from "./enums";
 
 export interface Comunidad {
-  com_id: number;
+  com_id?: number | null;
   com_nombre: string;
   com_descripcion: string;
   com_img_url?: string;
@@ -17,6 +17,8 @@ export interface GetCommunitiesResponse {
 }
 
 export interface ContenidoAdicionalComunidades {
+  cac_id?: number;
+  com_id?: number;
   cac_imr_url?: string;
   cac_titulo?: string;
   cac_subtitulo?: string;

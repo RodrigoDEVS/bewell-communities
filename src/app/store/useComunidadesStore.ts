@@ -1,12 +1,14 @@
 import { create } from "zustand";
 import Swal from "sweetalert2";
 import { EstadoGeneral } from "../types/enums";
+import { Comunidad } from "../types/comunidades";
 
 interface ComunidadesState {
   estados: { id: number; value: string; label: string }[];
   selectedRows: number[];
   selectAll: boolean;
   filtroEstado: string | null;
+  selectedCommunity: Comunidad | null;
 
   // Acciones
   toggleSelectAll: () => void;
@@ -21,6 +23,7 @@ interface ComunidadesState {
   setFiltroEstado: (estado: string | null) => void;
   downloadListado: () => void;
   crearNuevaComunidad: () => void;
+  setSelectedCommunity: (comunidad: Comunidad | null) => void;
 }
 
 export const useComunidadesStore = create<ComunidadesState>((set, get) => ({
@@ -36,6 +39,7 @@ export const useComunidadesStore = create<ComunidadesState>((set, get) => ({
     const { selectAll } = get();
     set({ selectedRows: [], selectAll: true });
   },
+  selectedCommunity: null,
 
   toggleSelectRow: (id: number) => {
     const { selectedRows } = get();
@@ -117,5 +121,9 @@ export const useComunidadesStore = create<ComunidadesState>((set, get) => ({
   crearNuevaComunidad: () => {
     console.log("Crear nueva comunidad");
     // Aquí iría la lógica para crear una nueva comunidad
+  },
+
+  setSelectedCommunity: (comunidad: Comunidad | null) => {
+    set({ selectedCommunity: comunidad });
   },
 }));

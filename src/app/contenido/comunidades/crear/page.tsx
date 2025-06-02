@@ -2,5 +2,5 @@ import ComunidadesFormTemplate from "@/app/components/templates/ComunidadesFormT
 import React from "react";
 
 export default function ComunidadesFormPage() {
-  return <ComunidadesFormTemplate />;
+  return <ComunidadesFormTemplate mode="create" />;
 }

@@ -97,7 +97,7 @@ export function useComunidad(id: number) {
   });
 }
 
-// Mutación GraphQL para crear una comunidad (ejemplo para implementación futura)
+// Mutación GraphQL para crear una comunidad
 const CREATE_COMMUNITY_MUTATION = `
   mutation CrearComunidad($input: CrearComunidadInput!) {
     createCommunity(comunidad: $input) {
@@ -141,13 +141,72 @@ async function createComunidad(
   }
 }
 
-// Hook para crear una comunidad (ejemplo para implementación futura)
+// Hook para crear una comunidad
 export function useCreateComunidad() {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: createComunidad,
     // Invalidar la consulta de comunidades cuando se crea una nueva
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.comunidades });
+    },
+  });
+}
+
+// Mutación GraphQL para editar una comunidad
+const EDIT_COMMUNITY_MUTATION = `
+  mutation ActualizarComunidad($comId: Int!, $input: ActualizarComunidadInput!) {
+    updateCommunity(com_id: $comId, comunidad: $input) {
+      com_id
+      com_nombre
+      com_descripcion
+      com_img_url
+      com_status
+      com_url_video
+      com_descripcion_corta
+      ContenidoAdicionalComunidades{
+        cac_id
+        com_id
+        cac_imr_url
+        cac_titulo
+        cac_subtitulo
+        cac_url_contenido
+        cac_url_info
+        cac_estado
+        cac_sucursal
+      }
+    }
+  }
+`;
+
+// Función para editar una comunidad
+async function updateCommunity(data: Comunidad): Promise<Comunidad> {
+  try {
+    // Separar el ID del resto de los datos
+    const { com_id, ...comunidadData } = data;
+
+    const response = await graphqlClient.query<{ updateCommunity: Comunidad }>(
+      EDIT_COMMUNITY_MUTATION,
+      {
+        comId: com_id,
+        input: comunidadData,
+      }
+    );
+    return response.updateCommunity;
+  } catch (error) {
+    console.error("Error updatingCommunity community:", error);
+    throw error;
+  }
+}
+
+// Hook para editar una comunidad
+export function useEditarComunidad() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: updateCommunity,
+    // Invalidar la consulta de comunidades cuando se edita
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.comunidades });
     },
