@@ -1,0 +1,15 @@
+
+[site]
+bucket = "./out"
+entry-point = "."
+
+[build]
+command = "npm run build"
+cwd = "."
+watch_dir = "src"
+
+[env.production]
+route = ""
+
+[build.upload]
+format = "service-worker"
