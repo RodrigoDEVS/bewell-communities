@@ -28,12 +28,12 @@ const ComunidadesToolbar = () => {
               options={estados}
               customSize="small"
               onChange={(e) => {
-                const value = e.target.value;
-                if (value === "") return;
-                editEstadoComunidades(
-                  selectedRows,
-                  value as "Activo" | "Inactivo"
-                );
+                // const value = e.target.value;
+                // if (value === "") return;
+                // editEstadoComunidades(
+                //   selectedRows,
+                //   value as "Activo" | "Inactivo"
+                // );
               }}
             />
 
@@ -62,7 +62,7 @@ const ComunidadesToolbar = () => {
         <Button
           variant="delete-outline"
           size="medium"
-          onClick={() => router.push("/contenido/comunidades/comunidades_form")}
+          onClick={() => router.push("/contenido/comunidades/crear")}
         >
           <CirclePlus className="mr-2" />
           Nuevo

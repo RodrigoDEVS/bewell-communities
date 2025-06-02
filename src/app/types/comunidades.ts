@@ -5,7 +5,7 @@ export interface Comunidad {
   com_nombre: string;
   com_descripcion: string;
   com_img_url?: string;
-  com_status: EstadoGeneral;
+  com_status: EstadoGeneral | string;
   com_url_video?: string;
   com_descripcion_corta?: string;
   ContenidoAdicionalComunidades?: ContenidoAdicionalComunidades[];

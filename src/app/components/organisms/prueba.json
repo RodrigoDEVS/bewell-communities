@@ -1,0 +1,22 @@
+{
+  "com_nombre": "Comunidad de Corredores",
+  "com_descripcion": "feqwrtewqrwerwerwerewqrrrrrrrfkopqjiorjpeiqwuripquerpiquwerpioquweriuewipruqewiopruqpirupioewuripoweuriouqwuerpwqieurpqwieouriopewurpiuewioruqpoieruproiewuroiieqwuripqueiropqupoieuoipruqpuroeiqpwurpoeq",
+  "com_status": "ACTIVO",
+  "com_img_url": "https://res.cloudinary.com/dmyq1ekef/image/upload/v1736962122/cld-sample.jpg",
+  "ContenidoAdicionalComunidades": [
+    {
+      "cac_titulo": "Comunidad de Corredores",
+      "cac_subtitulo": "subtitulo",
+      "cac_imr_url": "https://res.cloudinary.com/dmyq1ekef/image/upload/v1736962122/cld-sample.jpg",
+      "cac_url_contenido": "https://www.google.com/?client=safari",
+      "cac_estado": "ACTIVO"
+    },
+    {
+      "cac_titulo": "hola",
+      "cac_subtitulo": "test",
+      "cac_imr_url": "https://res.cloudinary.com/dmyq1ekef/image/upload/v1736962122/cld-sample.jpg",
+      "cac_url_contenido": "https://www.google.com/?client=safari",
+      "cac_estado": "ACTIVO"
+    }
+  ]
+}

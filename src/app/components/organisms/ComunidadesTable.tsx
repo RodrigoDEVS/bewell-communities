@@ -1,21 +1,18 @@
 "use client";
+
 import { Pencil, ImageIcon, Loader2 } from "lucide-react";
 import { useComunidadesStore } from "@/app/store/useComunidadesStore";
 import { useComunidades } from "@/app/api/queries/comunidades";
+import { useRouter } from "next/navigation";
 
 export default function ComunidadesTable() {
+  const router = useRouter();
   // Obtenemos las comunidades usando React Query
   const { data: comunidades, isLoading, error } = useComunidades();
 
   // Accedemos al store de comunidades para las funciones de selección y acciones
-  const {
-    selectedRows,
-    selectAll,
-    toggleSelectAll,
-    toggleSelectRow,
-    editComunidad,
-    //downloadComunidad,
-  } = useComunidadesStore();
+  const { selectedRows, selectAll, toggleSelectAll, toggleSelectRow } =
+    useComunidadesStore();
 
   // Si está cargando, mostramos un spinner
   if (isLoading) {
@@ -45,6 +42,11 @@ export default function ComunidadesTable() {
       </div>
     );
   }
+
+  const handleEditComunidad = (id: number) => {
+    console.log(id);
+    router.push("/contenido/comunidades/crear");
+  };
 
   return (
     <div className="max-h-[calc(100vh-360px)] overflow-x-auto bg-white rounded-lg shadow">
@@ -148,7 +150,7 @@ export default function ComunidadesTable() {
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                 <button
-                  onClick={() => editComunidad(comunidad.com_id)}
+                  onClick={() => handleEditComunidad(comunidad.com_id)}
                   className="text-gray-400 hover:text-gray-600 inline-flex items-center"
                 >
                   <Pencil className="h-4 w-4 mr-1" />

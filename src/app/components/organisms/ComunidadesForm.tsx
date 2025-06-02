@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Link, Trash2 } from "lucide-react";
+import { Link, Plus, Trash2 } from "lucide-react";
 import LittleForm from "./LittleForm";
 import RetosForm from "./RetosForm";
 import Select from "../atoms/Select";
@@ -22,18 +22,10 @@ export default function ComunidadesForm() {
     validateForm,
     setSubmitting,
     resetForm,
+    addLink,
+    updateLink,
+    removeLink,
   } = useComunidadesFormStore();
-
-  useEffect(() => {
-    formData.links.push({
-      id: "",
-      titulo: "",
-      subtitulo: "",
-      imagen: "",
-      estado: "",
-      link: "",
-    });
-  }, []);
 
   // Hook de mutación de React Query
   const crearComunidadMutation = useCreateComunidad();
@@ -106,22 +98,30 @@ export default function ComunidadesForm() {
 
     try {
       // Preparar datos para enviar
-      const comunidadData: Omit<Comunidad, "com_id"> = {
+      const comunidadData = {
         com_nombre: formData.titulo,
         com_descripcion: formData.descripcion,
-        com_descripcion_corta: formData.descripcionCorta || undefined,
-        com_img_url: formData.imagen || undefined,
         com_status: formData.estado as EstadoGeneral,
-        com_url_video: formData.videoEnabled
-          ? formData.videoUrl || undefined
-          : undefined,
-        ContenidoAdicionalComunidades: formData.links.map((link) => ({
-          cac_titulo: link.titulo,
-          cac_subtitulo: link.subtitulo,
-          cac_imr_url: link.imagen,
-          cac_url_contenido: link.link,
-          cac_estado: link.estado as EstadoGeneral,
-        })),
+        // Campos opcionales solo si tienen valor
+        ...(formData.descripcionCorta && {
+          com_descripcion_corta: formData.descripcionCorta,
+        }),
+        ...(formData.imagen && { com_img_url: formData.imagen }),
+        ...(formData.videoEnabled &&
+          formData.videoUrl && { com_url_video: formData.videoUrl }),
+        // Incluir links si están habilitados y hay datos
+        ...(formData.linksEnabled &&
+          formData.links.length > 0 && {
+            ContenidoAdicionalComunidades: formData.links
+              .filter((link) => link.titulo.trim() || link.link.trim()) // Solo incluir links con datos
+              .map((link) => ({
+                cac_titulo: link.titulo,
+                cac_subtitulo: link.subtitulo,
+                cac_imr_url: link.imagen,
+                cac_url_contenido: link.link,
+                cac_estado: link.estado as EstadoGeneral,
+              })),
+          }),
       };
 
       // Llamar a la mutación
@@ -134,6 +134,14 @@ export default function ComunidadesForm() {
       toast.error("Error al crear la comunidad. Inténtalo de nuevo.");
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  // Función para manejar el primer link (agregar automáticamente si no existe)
+  const handleLinksEnabledChange = (enabled: boolean) => {
+    updateField("linksEnabled", enabled);
+    if (enabled && formData.links.length === 0) {
+      addLink(); // Agregar automáticamente el primer link
     }
   };
 
@@ -400,13 +408,11 @@ export default function ComunidadesForm() {
         {/* Links Section */}
         <div>
           <div className="mb-6 flex items-center justify-between">
-            <label>Links de interés</label>
+            <label className="text-lg font-medium">Links de interés</label>
             <div className="flex items-center">
               <button
                 type="button"
-                onClick={() =>
-                  updateField("linksEnabled", !formData.linksEnabled)
-                }
+                onClick={() => handleLinksEnabledChange(!formData.linksEnabled)}
                 className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
                   formData.linksEnabled ? "bg-red-500" : "bg-gray-200"
                 }`}
@@ -420,12 +426,40 @@ export default function ComunidadesForm() {
               </button>
             </div>
           </div>
-          {formData.linksEnabled &&
-            formData.links.map((link, index) => (
-              <LittleForm formTitle={`Link #${index + 1}`} />
-            ))}
 
-          <div className="mb-5"></div>
+          {formData.linksEnabled && (
+            <div className="space-y-4">
+              {formData.links.length === 0 && (
+                <div className="text-center py-8 border-2 border-dashed border-gray-300 rounded-lg">
+                  <p className="text-gray-500 mb-4">No hay links agregados</p>
+                  <button
+                    type="button"
+                    onClick={addLink}
+                    disabled={isSubmitting}
+                    className="bg-blue-500 hover:bg-blue-600 disabled:bg-gray-400 text-white px-4 py-2 rounded-md text-sm inline-flex items-center gap-2"
+                  >
+                    <Plus className="w-4 h-4" />
+                    Agregar Primer Link
+                  </button>
+                </div>
+              )}
+
+              {formData.links.map((link, index) => (
+                <LittleForm
+                  key={link.id}
+                  formTitle={`Link #${index + 1}`}
+                  linkId={link.id ?? ""}
+                  initialData={link}
+                  onDataChange={updateLink}
+                  onRemove={removeLink}
+                  onAdd={addLink}
+                  disabled={isSubmitting}
+                  showAddButton={index === formData.links.length - 1} // Solo mostrar botón + en el último
+                  showRemoveButton={formData.links.length > 1} // Solo mostrar botón - si hay más de uno
+                />
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Separador */}

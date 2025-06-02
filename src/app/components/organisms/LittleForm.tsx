@@ -1,15 +1,59 @@
+"use client";
+
 import { Plus, Trash2 } from "lucide-react";
 import React from "react";
 import Select from "../atoms/Select";
 import { useComunidadesStore } from "@/app/store/useComunidadesStore";
+import { EstadoGeneral } from "@/app/types/enums";
+
+interface LinkData {
+  id?: string;
+  titulo: string;
+  subtitulo: string;
+  imagen: string;
+  estado: EstadoGeneral | "";
+  link: string;
+}
 
 interface FormProps {
   formTitle?: string;
+  linkId: string;
+  initialData?: Partial<LinkData>;
+  onDataChange: (id: string, data: LinkData) => void;
+  onRemove: (id: string) => void;
+  onAdd: () => void;
+  disabled?: boolean;
+  showAddButton?: boolean;
+  showRemoveButton?: boolean;
 }
 
-export default function LittleForm(props: FormProps) {
+export default function LittleForm({
+  formTitle,
+  linkId,
+  initialData = {},
+  onDataChange,
+  onRemove,
+  onAdd,
+  disabled = false,
+  showAddButton = true,
+  showRemoveButton = true,
+}: FormProps) {
   const { estados } = useComunidadesStore();
-  const { formTitle } = props;
+
+  const [formData, setFormData] = React.useState<LinkData>({
+    titulo: initialData.titulo || "",
+    subtitulo: initialData.subtitulo || "",
+    imagen: initialData.imagen || "",
+    estado: initialData.estado || "",
+    link: initialData.link || "",
+  });
+
+  const handleInputChange = (field: keyof LinkData, value: string) => {
+    const newData = { ...formData, [field]: value };
+    setFormData(newData);
+    onDataChange(linkId, newData);
+  };
+
   return (
     <div className="items-center justify-center flex">
       <div>
@@ -20,55 +64,69 @@ export default function LittleForm(props: FormProps) {
               <div>
                 <label
                   className="block text-gray-700 font-medium"
-                  htmlFor="titulo"
+                  htmlFor={`titulo-${linkId}`}
                 >
                   Titulo
                 </label>
                 <input
-                  id="titulo"
+                  id={`titulo-${linkId}`}
                   type="text"
                   name="titulo"
-                  className="w-full border rounded border-gray-300 bg-gray-100 focus:outline-none focus:border-transparent focus:ring-blue-500 focus:ring-2 text-sm px-3 py-2"
+                  value={formData.titulo}
+                  onChange={(e) => handleInputChange("titulo", e.target.value)}
+                  disabled={disabled}
+                  className="w-full border rounded border-gray-300 bg-gray-100 focus:outline-none focus:border-transparent focus:ring-blue-500 focus:ring-2 text-sm px-3 py-2 disabled:opacity-50"
+                  placeholder="Título del link"
                 />
-                {/* Separador */}
                 <hr className="border-gray-200 mt-2" />
               </div>
+
               <div>
                 <label
                   className="block text-gray-700 font-medium"
-                  htmlFor="subtitulo"
+                  htmlFor={`subtitulo-${linkId}`}
                 >
                   Subtitulo
                 </label>
                 <input
-                  id="subtitulo"
+                  id={`subtitulo-${linkId}`}
                   type="text"
                   name="subtitulo"
-                  className="w-full border rounded border-gray-300 bg-gray-100 focus:outline-none focus:border-transparent focus:ring-blue-500 focus:ring-2 text-sm px-3 py-2"
+                  value={formData.subtitulo}
+                  onChange={(e) =>
+                    handleInputChange("subtitulo", e.target.value)
+                  }
+                  disabled={disabled}
+                  className="w-full border rounded border-gray-300 bg-gray-100 focus:outline-none focus:border-transparent focus:ring-blue-500 focus:ring-2 text-sm px-3 py-2 disabled:opacity-50"
+                  placeholder="Subtítulo del link"
                 />
-                {/* Separador */}
                 <hr className="border-gray-200 mt-2" />
               </div>
+
               <div>
                 <label
                   className="block text-gray-700 font-medium"
-                  htmlFor="imagen"
+                  htmlFor={`imagen-${linkId}`}
                 >
                   Imagen
                 </label>
                 <input
-                  id="imagen"
-                  type="text"
+                  id={`imagen-${linkId}`}
+                  type="url"
                   name="imagen"
-                  className="w-full border rounded border-gray-300 bg-gray-100 focus:outline-none focus:border-transparent focus:ring-blue-500 focus:ring-2 text-sm px-3 py-2"
+                  value={formData.imagen}
+                  onChange={(e) => handleInputChange("imagen", e.target.value)}
+                  disabled={disabled}
+                  className="w-full border rounded border-gray-300 bg-gray-100 focus:outline-none focus:border-transparent focus:ring-blue-500 focus:ring-2 text-sm px-3 py-2 disabled:opacity-50"
+                  placeholder="URL de la imagen"
                 />
-                {/* Separador */}
                 <hr className="border-gray-200 mt-2" />
               </div>
+
               {/* Estado */}
               <div>
                 <label
-                  htmlFor="estados"
+                  htmlFor={`estados-${linkId}`}
                   className="text-sm mr-2 text-gray-700 font-medium"
                 >
                   Estado:
@@ -77,77 +135,60 @@ export default function LittleForm(props: FormProps) {
                   options={estados}
                   customSize="small"
                   style={{ fontSize: 14 }}
-                  onChange={(e) => {}}
+                  value={formData.estado}
+                  onChange={(value) => handleInputChange("estado", value)}
+                  disabled={disabled}
+                  placeholder="Seleccionar estado..."
                 />
               </div>
-              <div>
-                {/* <div className="flex space-x-4">
-                  <div>
-                    <label
-                      className="block text-gray-700 text-sm"
-                      htmlFor="vigenciaInicio"
-                    >
-                      Fecha Inicio
-                    </label>
-                    <input
-                      id="vigenciaInicio"
-                      type="text"
-                      name="vigenciaInicio"
-                      className="w-full border rounded border-gray-300 bg-gray-100 focus:outline-none focus:border-transparent focus:ring-blue-500 focus:ring-2 text-sm px-3 py-2"
-                    />
-                  </div>
-                  <div>
-                    <label
-                      className="block text-gray-700 text-sm"
-                      htmlFor="vigenciaFin"
-                    >
-                      Fecha Fin
-                    </label>
-                    <input
-                      id="vigenciaFin"
-                      type="text"
-                      name="vigenciaFin"
-                      className="w-full border rounded border-gray-300 bg-gray-100 focus:outline-none focus:border-transparent focus:ring-blue-500 focus:ring-2 text-sm px-3 py-2"
-                    />
-                  </div>
-                </div> */}
 
-                {/* Separador */}
-                {/* <hr className="border-gray-200 mt-2" /> */}
-              </div>
               <div>
                 <label
                   className="block text-gray-700 font-medium"
-                  htmlFor="link"
+                  htmlFor={`link-${linkId}`}
                 >
                   Link
                 </label>
                 <input
-                  id="link"
-                  type="text"
+                  id={`link-${linkId}`}
+                  type="url"
                   name="link"
-                  className="w-full border rounded border-gray-300 bg-gray-100 focus:outline-none focus:border-transparent focus:ring-blue-500 focus:ring-2 text-sm px-3 py-2"
+                  value={formData.link}
+                  onChange={(e) => handleInputChange("link", e.target.value)}
+                  disabled={disabled}
+                  className="w-full border rounded border-gray-300 bg-gray-100 focus:outline-none focus:border-transparent focus:ring-blue-500 focus:ring-2 text-sm px-3 py-2 disabled:opacity-50"
+                  placeholder="URL del link"
                 />
-                {/* Separador */}
                 <hr className="border-gray-200 mt-2" />
               </div>
             </div>
           </div>
-          <div className="flex p-2 items-center justify-center">
-            <button
-              type="button"
-              onClick={() => {}}
-              className="mr-6 w-10 h-10 bg-white border border-gray-300 rounded-lg flex items-center justify-center hover:bg-gray-50 transition-colors hover:cursor-pointer"
-            >
-              <Trash2 className="w-4 h-4 text-gray-600" />
-            </button>
-            <button
-              type="button"
-              onClick={() => {}}
-              className=" w-10 h-10 bg-white border border-gray-300 rounded-lg flex items-center justify-center hover:bg-gray-50 transition-colors hover:cursor-pointer"
-            >
-              <Plus className="w-4 h-4 text-gray-600" />
-            </button>
+
+          {/* Botones de acción */}
+          <div className="flex p-2 items-center justify-center gap-2">
+            {showRemoveButton && (
+              <button
+                type="button"
+                onClick={() => onRemove(linkId)}
+                disabled={disabled}
+                className="w-10 h-10 bg-white border border-gray-300 rounded-lg flex items-center justify-center hover:bg-red-50 hover:border-red-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                title="Eliminar link"
+              >
+                <Trash2 className="w-4 h-4 text-red-600" />
+              </button>
+            )}
+
+            {showAddButton && (
+              <button
+                type="button"
+                onClick={onAdd}
+                disabled={disabled}
+                className="w-10 h-10 bg-white border border-gray-300 rounded-lg flex items-center justify-center hover:bg-green-50 hover:border-green-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                title="Agregar nuevo link"
+              >
+                <Plus className="w-4 h-4 text-green-600" />
+              </button>
+            )}
           </div>
         </div>
       </div>
