@@ -3,12 +3,60 @@ import Swal from "sweetalert2";
 import { EstadoGeneral } from "../types/enums";
 import { Comunidad } from "../types/comunidades";
 
+// Agregar esta función helper al inicio del archivo, antes del create
+const downloadCSV = (data: any[], filename: string) => {
+  if (!data || data.length === 0) {
+    console.log("No hay datos para descargar");
+    return;
+  }
+
+  // Definir las columnas que queremos en el CSV
+  const headers = [
+    "ID",
+    "Nombre de la Comunidad",
+    "Estado",
+    "URL de Imagen",
+    "Fecha de Creación",
+  ];
+
+  // Convertir los datos a formato CSV
+  const csvContent = [
+    // Encabezados
+    headers.join(","),
+    // Datos
+    ...data.map((comunidad) =>
+      [
+        comunidad.com_id || "",
+        `"${(comunidad.com_nombre || "").replace(/"/g, '""')}"`, // Escapar comillas
+        comunidad.com_status || "",
+        `"${(comunidad.com_img_url || "").replace(/"/g, '""')}"`, // Escapar comillas
+        comunidad.com_fecha_creacion || "",
+      ].join(",")
+    ),
+  ].join("\n");
+
+  // Crear el blob y descargar
+  const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+  const link = document.createElement("a");
+
+  if (link.download !== undefined) {
+    const url = URL.createObjectURL(blob);
+    link.setAttribute("href", url);
+    link.setAttribute("download", filename);
+    link.style.visibility = "hidden";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+};
+
 interface ComunidadesState {
   estados: { id: number; value: string; label: string }[];
   selectedRows: number[];
   selectAll: boolean;
   filtroEstado: string | null;
   selectedCommunity: Comunidad | null;
+  searchTerm: string;
 
   // Acciones
   toggleSelectAll: (allIds?: number[]) => void;
@@ -20,7 +68,7 @@ interface ComunidadesState {
   ) => void;
   downloadComunidad: (id: number) => void;
   deleteComunidades: (ids: number[]) => void;
-  downloadListado: () => void;
+  downloadListado: (comunidadesFiltradas: any[]) => void;
   crearNuevaComunidad: () => void;
   setSelectedCommunity: (comunidad: Comunidad | null) => void;
 
@@ -28,6 +76,11 @@ interface ComunidadesState {
   clearSelection: () => void;
   setFiltroEstado: (estado: string | null) => void;
   getFilteredComunidades: (comunidades: any[]) => any[];
+
+  // Acciones para búsqueda
+  setSearchTerm: (term: string) => void;
+  clearSearch: () => void;
+  clearAllFilters: () => void;
 }
 
 export const useComunidadesStore = create<ComunidadesState>((set, get) => ({
@@ -39,6 +92,7 @@ export const useComunidadesStore = create<ComunidadesState>((set, get) => ({
   selectAll: false,
   filtroEstado: null,
   selectedCommunity: null,
+  searchTerm: "",
 
   toggleSelectAll: (allIds?: number[]) => {
     const { selectedRows, selectAll } = get();
@@ -151,49 +205,108 @@ export const useComunidadesStore = create<ComunidadesState>((set, get) => ({
     set({ selectedRows: [], selectAll: false });
   },
 
-  // Filtrar comunidades por estado
-  getFilteredComunidades: (comunidades: any[]) => {
-    const { filtroEstado } = get();
+  // 🔧 Función de filtrado con búsqueda
+  getFilteredComunidades: (comunidades: Comunidad[]) => {
+    const { filtroEstado, searchTerm } = get();
 
     console.log("🔍 Filtrando comunidades:", {
       filtroEstado,
+      searchTerm,
       totalComunidades: comunidades.length,
-      primerasComunidades: comunidades
-        .slice(0, 2)
-        .map((c) => ({ id: c.com_id, status: c.com_status })),
-    }); // Debug
-
-    if (!filtroEstado) {
-      // Si no hay filtro, devolver todas las comunidades
-      console.log("✅ Sin filtro, devolviendo todas las comunidades");
-      return comunidades;
-    }
-
-    // Filtrar por estado usando los valores exactos del enum
-    const filtered = comunidades.filter((comunidad) => {
-      var fixedFilter = "";
-      if (filtroEstado === "ACTIVO") {
-        fixedFilter = "Activo";
-      } else if (filtroEstado === "INACTIVO") {
-        fixedFilter = "Inactivo";
-      }
-      return comunidad.com_status === fixedFilter;
     });
 
-    console.log("✅ Comunidades filtradas:", {
+    let filtered = [...comunidades];
+
+    // 🆕 Filtrar por término de búsqueda (nombre de comunidad)
+    if (searchTerm.trim()) {
+      filtered = filtered.filter((comunidad) =>
+        comunidad.com_nombre.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+      console.log(
+        `🔍 Filtrado por búsqueda "${searchTerm}": ${filtered.length} resultados`
+      );
+    }
+
+    // Filtrar por estado
+    if (filtroEstado) {
+      filtered = filtered.filter((comunidad) => {
+        if (filtroEstado === "ACTIVO") {
+          return (
+            comunidad.com_status === "ACTIVO" ||
+            comunidad.com_status === "Activo"
+          );
+        } else if (filtroEstado === "INACTIVO") {
+          return (
+            comunidad.com_status === "INACTIVO" ||
+            comunidad.com_status === "Inactivo"
+          );
+        } else if (filtroEstado === "Activo") {
+          return (
+            comunidad.com_status === "ACTIVO" ||
+            comunidad.com_status === "Activo"
+          );
+        } else if (filtroEstado === "Inactivo") {
+          return (
+            comunidad.com_status === "INACTIVO" ||
+            comunidad.com_status === "Inactivo"
+          );
+        }
+        return true;
+      });
+      console.log(
+        `🔍 Filtrado por estado "${filtroEstado}": ${filtered.length} resultados`
+      );
+    }
+
+    console.log("✅ Resultado final del filtrado:", {
       filtroEstado,
+      searchTerm,
       resultados: filtered.length,
-      ejemplos: filtered
-        .slice(0, 2)
-        .map((c) => ({ id: c.com_id, status: c.com_status })),
-    }); // Debug
+      ejemplos: filtered.slice(0, 2).map((c) => ({
+        id: c.com_id,
+        nombre: c.com_nombre,
+        status: c.com_status,
+      })),
+    });
 
     return filtered;
   },
 
-  downloadListado: () => {
-    console.log("Descargar listado de comunidades");
-    // Aquí iría la lógica para descargar el listado
+  downloadListado: (comunidadesFiltradas: any[]) => {
+    console.log("Descargando listado de comunidades filtradas...");
+
+    if (!comunidadesFiltradas || comunidadesFiltradas.length === 0) {
+      // Mostrar mensaje si no hay datos para descargar
+      Swal.fire({
+        title: "Sin datos",
+        text: "No hay comunidades para descargar con los filtros actuales.",
+        icon: "info",
+        confirmButtonText: "Entendido",
+        customClass: {
+          confirmButton:
+            "bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded",
+        },
+        buttonsStyling: false,
+      });
+      return;
+    }
+
+    // Generar nombre del archivo con fecha y hora
+    const now = new Date();
+    const timestamp = now.toISOString().slice(0, 19).replace(/[:-]/g, "");
+    const filename = `comunidades_${timestamp}.csv`;
+
+    // Descargar el CSV
+    downloadCSV(comunidadesFiltradas, filename);
+
+    // Mostrar mensaje de éxito
+    Swal.fire({
+      title: "¡Descarga exitosa!",
+      text: `Se ha descargado el archivo ${filename} con ${comunidadesFiltradas.length} comunidades.`,
+      icon: "success",
+      timer: 3000,
+      showConfirmButton: false,
+    });
   },
 
   crearNuevaComunidad: () => {
@@ -203,5 +316,27 @@ export const useComunidadesStore = create<ComunidadesState>((set, get) => ({
 
   setSelectedCommunity: (comunidad: Comunidad | null) => {
     set({ selectedCommunity: comunidad });
+  },
+
+  // Funciones para búsqueda
+  setSearchTerm: (term: string) => {
+    console.log("🔍 Estableciendo término de búsqueda:", term);
+    set({ searchTerm: term });
+    // Limpiar selección cuando se busca
+    set({ selectedRows: [], selectAll: false });
+  },
+
+  clearSearch: () => {
+    set({ searchTerm: "" });
+    set({ selectedRows: [], selectAll: false });
+  },
+
+  clearAllFilters: () => {
+    set({
+      searchTerm: "",
+      filtroEstado: null,
+      selectedRows: [],
+      selectAll: false,
+    });
   },
 }));

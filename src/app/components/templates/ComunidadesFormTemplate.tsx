@@ -52,8 +52,6 @@ export default function ComunidadesFormTemplate({
         );
         updateField("links", links);
       }
-
-      toast.success("Datos de la comunidad cargados");
     }
   }, [mode, comunidad, updateField, resetForm]);
 

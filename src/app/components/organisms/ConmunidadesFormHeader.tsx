@@ -4,6 +4,7 @@ import React from "react";
 import Button from "../atoms/Button";
 import { Download } from "lucide-react";
 import { useComunidadesFormStore } from "@/app/store/useComunidadFormStore";
+import { useComunidadesStore } from "@/app/store/useComunidadesStore";
 
 interface ComunidadesFormHeaderProps {
   mode: "create" | "edit";
@@ -13,6 +14,11 @@ export default function ConmunidadesFormHeader({
   mode,
 }: ComunidadesFormHeaderProps) {
   const { isSubmitting } = useComunidadesFormStore();
+  const { selectedCommunity, downloadListado } = useComunidadesStore();
+
+  const handleDownload = () => {
+    downloadListado([selectedCommunity]);
+  };
   return (
     <div className="flex-1 p-8">
       <div className="flex items-center justify-between space-x-4">
@@ -25,7 +31,7 @@ export default function ConmunidadesFormHeader({
         <div className="flex space-x-4">
           {/* Botón de descargar */}
           {mode === "edit" && (
-            <Button variant="outline" size="medium">
+            <Button variant="outline" size="medium" onClick={handleDownload}>
               <Download className="w-5 h-5" />
               <span>Descargar información</span>
             </Button>

@@ -129,6 +129,7 @@ export default function ComunidadesForm({ mode }: ComunidadesFormProps) {
                 cac_imr_url: link.imagen,
                 cac_url_contenido: link.link,
                 cac_estado: link.estado as EstadoGeneral,
+                cac_sucursal: link.sucursal || "Todas",
               })),
           }),
       };

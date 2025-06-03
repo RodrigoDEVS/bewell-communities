@@ -124,14 +124,15 @@ const CREATE_COMMUNITY_MUTATION = `
 `;
 
 // Función para crear una comunidad
-async function createComunidad(
-  data: Omit<Comunidad, "com_id">
-): Promise<Comunidad> {
+async function createComunidad(data: Comunidad): Promise<Comunidad> {
   try {
+    // Separar el ID del resto de los datos
+    const { com_id, ...comunidadData } = data;
+
     const response = await graphqlClient.query<{ createCommunity: Comunidad }>(
       CREATE_COMMUNITY_MUTATION,
       {
-        input: data,
+        input: comunidadData,
       }
     );
     return response.createCommunity;

@@ -25,6 +25,7 @@ interface LinkData {
   imagen: string;
   estado: EstadoGeneral | "";
   link: string;
+  sucursal?: string;
 }
 
 interface RetoData {
