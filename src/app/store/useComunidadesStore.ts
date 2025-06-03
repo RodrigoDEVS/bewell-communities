@@ -20,10 +20,14 @@ interface ComunidadesState {
   ) => void;
   downloadComunidad: (id: number) => void;
   deleteComunidades: (ids: number[]) => void;
-  setFiltroEstado: (estado: string | null) => void;
   downloadListado: () => void;
   crearNuevaComunidad: () => void;
   setSelectedCommunity: (comunidad: Comunidad | null) => void;
+
+  // Actions para filtros
+  clearSelection: () => void;
+  setFiltroEstado: (estado: string | null) => void;
+  getFilteredComunidades: (comunidades: any[]) => any[];
 }
 
 export const useComunidadesStore = create<ComunidadesState>((set, get) => ({
@@ -132,8 +136,59 @@ export const useComunidadesStore = create<ComunidadesState>((set, get) => ({
       });
   },
 
+  // Limpiar toda la selección
+  clearSelection: () => {
+    set({
+      selectedRows: [],
+      selectAll: false,
+    });
+  },
+
+  // Establecer filtro por estado
   setFiltroEstado: (estado: string | null) => {
     set({ filtroEstado: estado });
+    // Limpiar selección cuando se cambia el filtro
+    set({ selectedRows: [], selectAll: false });
+  },
+
+  // Filtrar comunidades por estado
+  getFilteredComunidades: (comunidades: any[]) => {
+    const { filtroEstado } = get();
+
+    console.log("🔍 Filtrando comunidades:", {
+      filtroEstado,
+      totalComunidades: comunidades.length,
+      primerasComunidades: comunidades
+        .slice(0, 2)
+        .map((c) => ({ id: c.com_id, status: c.com_status })),
+    }); // Debug
+
+    if (!filtroEstado) {
+      // Si no hay filtro, devolver todas las comunidades
+      console.log("✅ Sin filtro, devolviendo todas las comunidades");
+      return comunidades;
+    }
+
+    // Filtrar por estado usando los valores exactos del enum
+    const filtered = comunidades.filter((comunidad) => {
+      var fixedFilter = "";
+      if (filtroEstado === "ACTIVO") {
+        fixedFilter = "Activo";
+      } else if (filtroEstado === "INACTIVO") {
+        fixedFilter = "Inactivo";
+      }
+      return comunidad.com_status === fixedFilter;
+    });
+
+    console.log("✅ Comunidades filtradas:", {
+      filtroEstado,
+      resultados: filtered.length,
+      ejemplos: filtered
+        .slice(0, 2)
+        .map((c) => ({ id: c.com_id, status: c.com_status })),
+    }); // Debug
+
+    return filtered;
   },
 
   downloadListado: () => {

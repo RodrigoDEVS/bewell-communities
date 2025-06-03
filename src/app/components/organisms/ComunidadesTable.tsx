@@ -5,6 +5,7 @@ import { useComunidadesStore } from "@/app/store/useComunidadesStore";
 import { useComunidades } from "@/app/api/queries/comunidades";
 import { useRouter } from "next/navigation";
 import { Comunidad } from "@/app/types/comunidades";
+import { useEffect, useMemo } from "react";
 
 export default function ComunidadesTable() {
   const router = useRouter();
@@ -15,10 +16,24 @@ export default function ComunidadesTable() {
   const {
     selectedRows,
     selectAll,
+    filtroEstado,
     toggleSelectAll,
     toggleSelectRow,
     setSelectedCommunity,
+    clearSelection,
+    getFilteredComunidades,
   } = useComunidadesStore();
+
+  // Filtrar comunidades usando la función del store
+  const filteredComunidades = useMemo(() => {
+    if (!comunidades) return [];
+    return getFilteredComunidades(comunidades);
+  }, [comunidades, getFilteredComunidades, filtroEstado]);
+
+  // Limpiar selección cuando cambian las comunidades filtradas
+  useEffect(() => {
+    clearSelection();
+  }, [filteredComunidades.length, clearSelection]);
 
   // Si está cargando, mostramos un spinner
   if (isLoading) {
@@ -49,13 +64,25 @@ export default function ComunidadesTable() {
     );
   }
 
+  // Si no hay resultados después del filtrado
+  if (filteredComunidades.length === 0) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="text-gray-500 text-center">
+          <p>No se encontraron comunidades con el estado "{filtroEstado}"</p>
+          <p className="text-sm mt-2">Intenta cambiar el filtro de estado</p>
+        </div>
+      </div>
+    );
+  }
+
   const handleEditComunidad = (comunidad: Comunidad) => {
     setSelectedCommunity(comunidad);
     router.push(`/contenido/comunidades/editar`);
   };
 
   // Obtener todos los IDs de las comunidades
-  const allComunidadIds = comunidades.map((c) => c.com_id!);
+  const allComunidadIds = filteredComunidades.map((c) => c.com_id!);
 
   const handleSelectAllChange = () => {
     toggleSelectAll(allComunidadIds);
@@ -116,7 +143,7 @@ export default function ComunidadesTable() {
           </tr>
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
-          {comunidades.map((comunidad, index) => (
+          {filteredComunidades.map((comunidad, index) => (
             <tr
               key={comunidad.com_id}
               className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}
