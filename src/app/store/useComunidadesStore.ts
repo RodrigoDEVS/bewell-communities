@@ -11,7 +11,7 @@ interface ComunidadesState {
   selectedCommunity: Comunidad | null;
 
   // Acciones
-  toggleSelectAll: () => void;
+  toggleSelectAll: (allIds?: number[]) => void;
   toggleSelectRow: (id: number) => void;
   editComunidad: (id: number) => void;
   editEstadoComunidades: (
@@ -34,12 +34,35 @@ export const useComunidadesStore = create<ComunidadesState>((set, get) => ({
   selectedRows: [],
   selectAll: false,
   filtroEstado: null,
-
-  toggleSelectAll: () => {
-    const { selectAll } = get();
-    set({ selectedRows: [], selectAll: true });
-  },
   selectedCommunity: null,
+
+  toggleSelectAll: (allIds?: number[]) => {
+    const { selectedRows, selectAll } = get();
+
+    // Si no se pasan IDs, no podemos hacer nada
+    if (!allIds || allIds.length === 0) {
+      set({ selectedRows: [], selectAll: false });
+      return;
+    }
+
+    // Verificar si todos los elementos están seleccionados
+    const areAllSelected =
+      allIds.length > 0 && allIds.every((id) => selectedRows.includes(id));
+
+    if (areAllSelected) {
+      // Si todos están seleccionados, deseleccionar todos
+      set({
+        selectedRows: [],
+        selectAll: false,
+      });
+    } else {
+      // Si no todos están seleccionados, seleccionar todos
+      set({
+        selectedRows: [...allIds],
+        selectAll: true,
+      });
+    }
+  },
 
   toggleSelectRow: (id: number) => {
     const { selectedRows } = get();

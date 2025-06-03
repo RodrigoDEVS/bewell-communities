@@ -54,6 +54,13 @@ export default function ComunidadesTable() {
     router.push(`/contenido/comunidades/editar`);
   };
 
+  // Obtener todos los IDs de las comunidades
+  const allComunidadIds = comunidades.map((c) => c.com_id!);
+
+  const handleSelectAllChange = () => {
+    toggleSelectAll(allComunidadIds);
+  };
+
   return (
     <div className="max-h-[calc(100vh-360px)] overflow-x-auto bg-white rounded-lg shadow">
       <table className="w-full min-w-full divide-y divide-gray-200">
@@ -68,7 +75,7 @@ export default function ComunidadesTable() {
                   type="checkbox"
                   className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                   checked={selectAll}
-                  onChange={toggleSelectAll}
+                  onChange={handleSelectAllChange}
                 />
               </div>
             </th>
