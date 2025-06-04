@@ -213,3 +213,38 @@ export function useEditarComunidad() {
     },
   });
 }
+
+// Mutación GraphQL para eliminar contenido adicional
+const DELETE_COMMUNITY_CONTENT_MUTATION = `
+  mutation EliminarContenidoComunidad($cacId: Int!) {
+    deleteCommunityContentById(cac_id: $cacId) 
+    }
+`;
+
+// Función para eliminar contenido adicional
+async function deleteCommunityContentById(cacId: number): Promise<string> {
+  try {
+    const response = await graphqlClient.query<{
+      deleteCommunityContentById: string;
+    }>(DELETE_COMMUNITY_CONTENT_MUTATION, {
+      cacId: cacId,
+    });
+    return response.deleteCommunityContentById;
+  } catch (error) {
+    console.error("Error deleting content:", error);
+    throw error;
+  }
+}
+
+// Hook para eliminar contenido adicional
+export function useEliminarContenidoComunidad() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: deleteCommunityContentById,
+    // Invalidar la consulta de comunidades cuando se elimina
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.comunidades });
+    },
+  });
+}

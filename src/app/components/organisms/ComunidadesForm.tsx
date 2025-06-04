@@ -10,6 +10,7 @@ import { useComunidadesFormStore } from "@/app/store/useComunidadFormStore";
 import {
   useCreateComunidad,
   useEditarComunidad,
+  useEliminarContenidoComunidad,
 } from "@/app/api/queries/comunidades";
 import { toast } from "sonner";
 import { EstadoGeneral } from "@/app/types/enums";
@@ -19,7 +20,7 @@ interface ComunidadesFormProps {
 }
 
 export default function ComunidadesForm({ mode }: ComunidadesFormProps) {
-  const { estados } = useComunidadesStore();
+  const { estados, deleteContent } = useComunidadesStore();
   const {
     formData,
     errors,
@@ -36,6 +37,7 @@ export default function ComunidadesForm({ mode }: ComunidadesFormProps) {
   // Hooks de mutación de React Query
   const crearComunidadMutation = useCreateComunidad();
   const editarComunidadMutation = useEditarComunidad();
+  const eliminarContenido = useEliminarContenidoComunidad();
 
   const handleImageLinkClick = () => {
     const esUrlImagenValida = (url: string) => {
@@ -158,6 +160,24 @@ export default function ComunidadesForm({ mode }: ComunidadesFormProps) {
     updateField("linksEnabled", enabled);
     if (enabled && formData.links.length === 0) {
       addLink(); // Agregar automáticamente el primer link
+    }
+  };
+
+  // Funcion para eliminar contenido adicional
+  const handleEliminarContenido = async (
+    cacId: number | null,
+    linkId: string
+  ) => {
+    if (cacId !== null) {
+      await deleteContent(
+        cacId,
+        linkId,
+        removeLink,
+        eliminarContenido.mutateAsync
+      );
+      //removeLink(linkId);
+    } else {
+      removeLink(linkId);
     }
   };
 
@@ -467,11 +487,13 @@ export default function ComunidadesForm({ mode }: ComunidadesFormProps) {
                   linkId={link.id ?? ""}
                   initialData={link}
                   onDataChange={updateLink}
-                  onRemove={removeLink}
+                  onRemove={() => {
+                    handleEliminarContenido(link.linkId ?? null, link.id!);
+                  }}
                   onAdd={addLink}
                   disabled={isSubmitting}
                   showAddButton={index === formData.links.length - 1} // Solo mostrar botón + en el último
-                  showRemoveButton={formData.links.length > 1} // Solo mostrar botón - si hay más de uno
+                  // showRemoveButton={formData.links.length > 1} // Solo mostrar botón - si hay más de uno
                 />
               ))}
             </div>

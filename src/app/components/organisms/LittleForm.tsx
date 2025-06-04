@@ -8,6 +8,7 @@ import { EstadoGeneral } from "@/app/types/enums";
 
 interface LinkData {
   id?: string;
+  linkId?: number | null;
   titulo: string;
   subtitulo: string;
   imagen: string;

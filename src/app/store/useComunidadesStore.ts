@@ -68,6 +68,12 @@ interface ComunidadesState {
   ) => void;
   downloadComunidad: (id: number) => void;
   deleteComunidades: (ids: number[]) => void;
+  deleteContent: (
+    id: number,
+    linkId: string,
+    removeLink: (id: string) => void,
+    deleteFunction: (id: number) => Promise<string>
+  ) => Promise<void>;
   downloadListado: (comunidadesFiltradas: any[]) => void;
   crearNuevaComunidad: () => void;
   setSelectedCommunity: (comunidad: Comunidad | null) => void;
@@ -185,6 +191,66 @@ export const useComunidadesStore = create<ComunidadesState>((set, get) => ({
             selectedRows: [],
             selectAll: false,
           });
+        } else if (result.dismiss === Swal.DismissReason.cancel) {
+        }
+      });
+  },
+
+  deleteContent: async (
+    id: number,
+    linkId: string,
+    removeLink: (id: string) => void,
+    deleteFunction: (id: number) => Promise<string>
+  ) => {
+    const buttons = Swal.mixin({
+      customClass: {
+        confirmButton:
+          "bg-gray-400 hover:bg-gray-500 cursor-pointe text-white font-bold py-2 px-4 rounded-full mx-2",
+        cancelButton:
+          "bg-gray-400 hover:bg-gray-500 cursor-pointer text-white font-bold py-2 px-4 rounded-full mx-2",
+      },
+      buttonsStyling: false,
+    });
+    buttons
+      .fire({
+        title: '<span class="swal2-title-custom">Atención</span>',
+        text: "¿Esta seguro que desea eliminar este contenido?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Aceptar",
+        cancelButtonText: "Cancelar",
+        reverseButtons: true,
+        iconColor: "#f44336",
+      })
+      .then(async (result) => {
+        if (result.isConfirmed) {
+          // Mostrar loading
+          Swal.fire({
+            title: "Eliminando...",
+            allowOutsideClick: false,
+            didOpen: () => {
+              Swal.showLoading();
+            },
+          });
+          try {
+            // Ejecutar la función de eliminación pasada como argumento, con el ID
+            const response = await deleteFunction(id);
+            Swal.fire({
+              icon: "success",
+              title: "¡Eliminado!",
+              text: response || "El contenido ha sido eliminado correctamente.",
+              confirmButtonText: "Ok",
+            });
+            removeLink(linkId);
+          } catch (error: any) {
+            console.error("Error al eliminar el contenido:", error);
+            Swal.fire({
+              icon: "error",
+              title: "Error",
+              text: error.message || "No se pudo eliminar el contenido.",
+              confirmButtonText: "Ok",
+            });
+          }
         } else if (result.dismiss === Swal.DismissReason.cancel) {
         }
       });
