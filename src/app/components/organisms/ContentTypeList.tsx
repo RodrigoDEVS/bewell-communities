@@ -20,9 +20,9 @@ export default function ContentTypesList() {
         href="/contenido/comunidades"
       />
       <ContentTypeItem
-        title="Gustos y afinidades"
+        title="Gestion de Torneos"
         role="Usuario"
-        href="/contenido/gustos"
+        href="/contenido/torneos"
       />
       <ContentTypeItem
         title="Salud: Cuidamos de ti"
