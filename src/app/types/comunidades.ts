@@ -24,6 +24,6 @@ export interface ContenidoAdicionalComunidades {
   cac_subtitulo?: string;
   cac_url_contenido?: string;
   cac_url_info?: string;
-  cac_estado?: EstadoGeneral;
+  cac_estado?: EstadoGeneral | string;
   cac_sucursal?: string;
 }

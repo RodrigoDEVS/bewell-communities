@@ -4,6 +4,7 @@ import type {
   GetCommunitiesResponse,
 } from "@/app/types/comunidades";
 import { graphqlClient } from "@/app/config/graphql-client";
+import { EstadoGeneral } from "@/app/types/enums";
 
 // Claves de consulta para React Query
 export const queryKeys = {
@@ -207,6 +208,87 @@ export function useEditarComunidad() {
 
   return useMutation({
     mutationFn: updateCommunity,
+    // Invalidar la consulta de comunidades cuando se edita
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.comunidades });
+    },
+  });
+}
+
+// Mutación GraphQL para editar varias comunidades
+const UPDATE_MULTIPLE_COMMUNITIES_MUTATION = `
+  mutation UpdateMultipleCommunities($input: ActualizarMultipleComunidadInput!) {
+    updateMultipleCommunityList(comunidadList: $input) {
+      com_id
+      com_nombre
+      com_descripcion
+      com_img_url
+      com_status
+      com_url_video
+      com_descripcion_corta
+      ContenidoAdicionalComunidades{
+        cac_id
+        com_id
+        cac_imr_url
+        cac_titulo
+        cac_subtitulo
+        cac_url_contenido
+        cac_url_info
+        cac_estado
+        cac_sucursal
+      }
+    }
+  }
+`;
+
+// Función para editar varias comunidades
+async function updateMultipleCommunities(
+  data: Comunidad[]
+): Promise<Comunidad[]> {
+  try {
+    // Separar el ID del resto de los datos
+    const comunidadesInput = data.map((comunidad) => {
+      const { com_id, ...comunidadData } = comunidad;
+
+      if (comunidadData.ContenidoAdicionalComunidades) {
+        comunidadData.ContenidoAdicionalComunidades =
+          comunidadData.ContenidoAdicionalComunidades?.map((contenido) => {
+            const { com_id, cac_estado, ...contenidoData } = contenido;
+            let estadoContenido = cac_estado;
+            cac_estado === "Activo"
+              ? (estadoContenido = EstadoGeneral.ACTIVO)
+              : (estadoContenido = EstadoGeneral.INACTIVO);
+            return {
+              ...contenidoData,
+              cac_estado: estadoContenido,
+            };
+          });
+      }
+
+      return {
+        com_id,
+        comunidad: comunidadData,
+      };
+    });
+
+    const response = await graphqlClient.query<{
+      updateMultipleCommunityList: Comunidad[];
+    }>(UPDATE_MULTIPLE_COMMUNITIES_MUTATION, {
+      input: { comunidades: comunidadesInput },
+    });
+    return response.updateMultipleCommunityList;
+  } catch (error) {
+    console.error("Error updating multiple communities:", error);
+    throw error;
+  }
+}
+
+// Hook para editar varias comunidades
+export function useActualizarComunidades() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: updateMultipleCommunities,
     // Invalidar la consulta de comunidades cuando se edita
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.comunidades });
