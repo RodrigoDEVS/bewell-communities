@@ -3,7 +3,13 @@ import type { ButtonHTMLAttributes, ReactNode } from "react";
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: ReactNode;
-  variant?: "primary" | "outline" | "delete" | "delete-outline" | "icon";
+  variant?:
+    | "primary"
+    | "outline"
+    | "delete"
+    | "delete-outline"
+    | "icon"
+    | "rounded";
   size?: "small" | "medium" | "large" | "icon";
 }
 
@@ -32,6 +38,8 @@ export default function Button({
           ? "rounded-md border border-red-500 text-red-500 hover:bg-red-100"
           : variant === "icon"
           ? "w-8 h-8 bg-white border border-gray-300 rounded-full justify-center hover:bg-green-50 hover:border-green-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          : variant === "rounded"
+          ? "rounded-full bg-red-500 text-white hover:bg-red-600"
           : "rounded-md border border-gray-300 text-gray-700"
       }`}
       {...rest}

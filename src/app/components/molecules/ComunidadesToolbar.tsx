@@ -81,14 +81,7 @@ const ComunidadesToolbar = () => {
               onChange={(value) => {
                 const newValue = value;
                 if (value === "") return;
-                handleSelectedCommunities(value);
-                // Aquí podrías llamar a una función para actualizar el estado de las comunidades seleccionadas
-                // const value = e.target.value;
-                // if (value === "") return;
-                // editEstadoComunidades(
-                //   selectedRows,
-                //   value as "Activo" | "Inactivo"
-                // );
+                handleSelectedCommunities(value as string);
               }}
             />
 

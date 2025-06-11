@@ -1,9 +1,10 @@
 "use client";
 
-import React, { ReactNode, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import Button from "../../atoms/Button";
 import { TorneosData } from "@/app/types/torneos";
+import Select, { SelectOption } from "../../atoms/Select";
 
 interface ComponentsPopUpProps {
   isOpen: boolean;
@@ -20,8 +21,15 @@ export const ComponentsPopUp = ({
 }: ComponentsPopUpProps) => {
   // Estados para los diferentes tipos de formularios
   const [labelText, setLabelText] = useState("");
+  const [labelOption, setLabelOption] = useState("");
+  const [urlLink, setUrlLink] = useState<string>("");
   const [carouselImages, setCarouselImages] = useState(["", "", ""]);
   const [image, setImage] = useState("");
+  const [selectedInputOption, setSelectedInputOption] =
+    useState<SelectOption | null>();
+  const [maxBewins, setMaxBewins] = useState<number>(0);
+  const [valorUnitario, setValorUnitario] = useState<number>(0);
+  const [valorPesos, setValorPesos] = useState<number>(0);
 
   // Cerrar con la tecla Escape
   useEffect(() => {
@@ -68,13 +76,70 @@ export const ComponentsPopUp = ({
       newComponent = {
         ...newComponent,
         texto: labelText,
-        estilo: { fontSize: 22.0, fontWeight: "bold", color: "#000000" },
+        estilo:
+          labelOption === "Titulo"
+            ? { fontSize: 22.0, fontWeight: "bold", color: "#000000" }
+            : labelOption === "Subtitulo"
+            ? {
+                fontSize: 20.0,
+                fontWeight: "bold",
+                color: "#000000",
+              }
+            : labelOption === "Subtitulo2"
+            ? {
+                fontSize: 17.0,
+                fontWeight: "bold",
+                color: "#000000",
+                alineacion: "centro",
+              }
+            : {
+                fontSize: 15.0,
+                fontWeight: "normal",
+                color: "#000000",
+                alineacion: "centro",
+              },
       };
     } else if (tipo === "imagen") {
       newComponent = {
         ...newComponent,
         url: image,
         estilo: { width: 150, height: 150, borderRadius: 12 },
+      };
+    } else if (tipo === "label_link") {
+      newComponent = {
+        ...newComponent,
+        label: labelText,
+        url: urlLink,
+      };
+    } else if (tipo === "input") {
+      newComponent = {
+        ...newComponent,
+        id: (selectedInputOption?.value as string) || "",
+        label: selectedInputOption?.label || "",
+        inputType: (selectedInputOption?.id as string) || "",
+        requerido: true,
+      };
+    } else if (tipo === "checkbox") {
+      newComponent = {
+        ...newComponent,
+        id: "acepta_terminos",
+        label: labelText,
+        requerido: true,
+      };
+    } else if (tipo === "button") {
+      newComponent = {
+        ...newComponent,
+        texto: labelText,
+        accion: { tipo: "navegar", ruta: "/confirmacionPago" },
+      };
+    } else if (tipo === "medio_pago") {
+      newComponent = {
+        ...newComponent,
+        max_bewins: maxBewins,
+        valor_unitario: valorUnitario,
+        valor_en_pesos: valorPesos,
+        consideraciones: labelText,
+        requerido: true,
       };
     } else if (tipo === "carousel") {
       newComponent = {
@@ -97,28 +162,76 @@ export const ComponentsPopUp = ({
     setCarouselImages(newImages);
   };
 
+  // Label Options
+  const labelOptions = [
+    { value: "Titulo", label: "Titulo", id: "Titulo" },
+    { value: "Subtitulo", label: "Subtitulo", id: "Subtitulo" },
+    { value: "Subtitulo2", label: "Subtitulo2", id: "Subtitulo2" },
+    { value: "Contenido", label: "Contenido", id: "Contenido" },
+  ];
+
+  // Input Options value = id, label = label, id = inputType
+  const inputOptions = [
+    { value: "correo", label: "Correo", id: "correo" },
+    { value: "numero", label: "Número de identificación", id: "numero" },
+    { value: "nombre", label: "Nombre completo", id: "text" },
+    { value: "telefono", label: "Nombre de celular", id: "telefono" },
+    { value: "nombreequipo", label: "Nombre del equipo", id: "text" },
+    {
+      value: "nombre_participante",
+      label: "Nombre del Participante",
+      id: "text",
+    },
+  ];
+
   // Renderizar el contenido según el tipo
   const renderContent = () => {
     switch (tipo) {
       case "label":
         return (
           <div className="space-y-4">
-            <h3 className="text-lg font-medium">Agregar Titulo</h3>
+            <h3 className="text-lg font-medium">Agregar Texto</h3>
             <div className="space-y-2">
               <label
                 htmlFor="labelText"
                 className="block text-sm font-medium text-gray-700"
               >
-                Título de la etiqueta
+                Tipo
               </label>
-              <input
-                type="text"
-                id="labelText"
-                value={labelText}
-                onChange={(e) => setLabelText(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Ingrese el título"
-              />
+              <Select
+                className="w-[200px] h-[35px] border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                options={labelOptions}
+                value={labelOption}
+                onChange={(value) => {
+                  setLabelOption(value as string);
+                }}
+              ></Select>
+              <label
+                htmlFor="labelText"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Texto
+              </label>
+              {labelOption === "Contenido" ? (
+                <textarea
+                  className="border border-gray-300 rounded-md shadow-sm w-full px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  value={labelText}
+                  onChange={(e) => setLabelText(e.target.value)}
+                  placeholder="Ingrese el contenido"
+                  rows={4}
+                  name="laberArea"
+                  id="laberArea"
+                ></textarea>
+              ) : (
+                <input
+                  type="text"
+                  id="labelText"
+                  value={labelText}
+                  onChange={(e) => setLabelText(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="Ingrese el título"
+                />
+              )}
             </div>
           </div>
         );
@@ -144,6 +257,211 @@ export const ComponentsPopUp = ({
                   placeholder="https://ejemplo.com/imagen.jpg"
                 />
               </div>
+            </div>
+          </div>
+        );
+
+      case "divider":
+        return (
+          <div className="space-y-4">
+            <h3 className="text-lg font-medium">Agregar Linea de Division</h3>
+            <div className="space-y-2">
+              <label
+                htmlFor="labelText"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Divider
+              </label>
+              <div className="border-b border-gray-300 my-2"></div>
+            </div>
+          </div>
+        );
+
+      case "label_link":
+        return (
+          <div className="space-y-4">
+            <h3 className="text-lg font-medium">Agregar Link de Texto</h3>
+            <div className="space-y-2">
+              <label
+                htmlFor="labelText"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Texto
+              </label>
+              <input
+                type="text"
+                id="labelText"
+                value={labelText}
+                onChange={(e) => setLabelText(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                placeholder="Ingrese el texto"
+              />
+              <label
+                htmlFor="label_link"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Url
+              </label>
+              <input
+                type="text"
+                id="label_link"
+                value={urlLink}
+                onChange={(e) => setUrlLink(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                placeholder="Ingrese la url"
+              />
+            </div>
+          </div>
+        );
+
+      case "input":
+        return (
+          <div className="space-y-4">
+            <h3 className="text-lg font-medium">Agregar Campo de Texto</h3>
+            <div className="space-y-2">
+              <label
+                htmlFor="labelText"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Tipo
+              </label>
+              <Select
+                className="w-[250px] h-[35px] border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                options={inputOptions}
+                value={selectedInputOption?.value || ""}
+                returnObject
+                onChange={(value) => {
+                  if (value !== null) {
+                    console.log("Selected value:", JSON.stringify(value));
+                    setSelectedInputOption(value as SelectOption);
+                  }
+                }}
+              ></Select>
+            </div>
+          </div>
+        );
+
+      case "checkbox":
+        return (
+          <div className="space-y-4">
+            <h3 className="text-lg font-medium">Agregar Checkbox</h3>
+            <div className="space-y-2">
+              <label
+                htmlFor="labelText"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Texto
+              </label>
+              <input
+                type="text"
+                id="labelText"
+                value={labelText}
+                onChange={(e) => setLabelText(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                placeholder="Ingrese el texto del checkbox"
+              />
+            </div>
+          </div>
+        );
+
+      case "medio_pago":
+        return (
+          <div className="space-y-4">
+            <h3 className="text-lg font-medium">Agregar Medio de Pago</h3>
+            <div className="space-y-2">
+              <label
+                htmlFor="consideraciones"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Consideraciones
+              </label>
+              <input
+                type="text"
+                id="consideraciones"
+                value={labelText}
+                onChange={(e) => setLabelText(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                placeholder="Ingrese el texto"
+              />
+            </div>
+            <div className="space-y-2">
+              <label
+                htmlFor="max_bewins"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Max Bewins
+              </label>
+              <input
+                type="number"
+                id="max_bewins"
+                value={maxBewins}
+                onChange={(e) =>
+                  setMaxBewins(e.target.value ? parseInt(e.target.value) : 0)
+                }
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                placeholder="Ingrese el máximo de bewins"
+              />
+            </div>
+            <div className="space-y-2">
+              <label
+                htmlFor="valor_unitario"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Valor Unitario
+              </label>
+              <input
+                type="number"
+                id="valor_unitario"
+                value={valorUnitario}
+                onChange={(e) =>
+                  setValorUnitario(
+                    e.target.value ? parseInt(e.target.value) : 0
+                  )
+                }
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                placeholder="Ingrese el valor unitario"
+              />
+            </div>
+            <div className="space-y-2">
+              <label
+                htmlFor="valor_en_pesos"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Valor en Pesos
+              </label>
+              <input
+                type="number"
+                id="valor_en_pesos"
+                value={valorPesos}
+                onChange={(e) =>
+                  setValorPesos(e.target.value ? parseInt(e.target.value) : 0)
+                }
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                placeholder="Ingrese el texto"
+              />
+            </div>
+          </div>
+        );
+
+      case "button":
+        return (
+          <div className="space-y-4">
+            <h3 className="text-lg font-medium">Agregar Botón</h3>
+            <div className="space-y-2">
+              <label
+                htmlFor="labelText"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Texto
+              </label>
+              <input
+                type="text"
+                id="labelText"
+                value={labelText}
+                onChange={(e) => setLabelText(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                placeholder="Ingrese el texto del botón"
+              />
             </div>
           </div>
         );

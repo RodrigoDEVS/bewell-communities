@@ -1,8 +1,10 @@
 export interface TorneosData {
-  id?: number;
+  id?: string;
   tipo:
     | "imagen"
     | "label"
+    | "label_link"
+    | "divider"
     | "input"
     | "dropdown"
     | "checkbox"
@@ -19,7 +21,16 @@ export interface TorneosData {
   texto?: string;
   estilo?: Estilo;
   imagenes?: Imagenes[];
+  label?: string;
   url?: string;
+  inputType?: string;
+  placeholder?: string;
+  requerido?: boolean;
+  accion?: Accion;
+  max_bewins?: number;
+  valor_unitario?: number;
+  valor_en_pesos?: number;
+  consideraciones?: string;
 }
 
 interface Imagenes {
@@ -31,7 +42,13 @@ interface Estilo {
   fontSize?: number;
   fontWeight?: string;
   color?: string;
+  alineacion?: "left" | "centro" | "right" | "justify";
   width?: number;
   height?: number;
   borderRadius?: number;
+}
+
+interface Accion {
+  tipo?: string;
+  ruta?: string;
 }

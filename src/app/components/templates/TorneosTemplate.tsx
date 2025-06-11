@@ -27,7 +27,7 @@ export default function TorneosTemplate() {
 
   return (
     <div className="h-screen flex flex-col">
-      <h1 className="flex-shrink text-2xl font-bold mb-6 flex items-center text-red-600">
+      <h1 className="flex-shrink text-2xl font-bold mb-2 flex items-center text-red-600">
         <img src="/squares.png" alt="icono de cuadrados" className="mr-2" />
         Gestor de Torneos
       </h1>

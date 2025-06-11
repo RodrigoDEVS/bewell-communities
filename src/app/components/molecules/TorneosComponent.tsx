@@ -8,21 +8,17 @@ import type { TorneosData } from "@/app/types/torneos";
 interface TorneosComponentProps {
   children?: ReactNode;
   tipo: TorneosData["tipo"];
-  texto?: string;
-  url?: string;
   setPopUpOpen: (tipo: TorneosData["tipo"]) => void;
 }
 
 export default function TorneosComponent({
   children,
   tipo,
-  url,
   setPopUpOpen,
 }: TorneosComponentProps) {
   const handleClick = () => {
     const newComponent: TorneosData = {
       tipo: tipo,
-      imagenes: [{ url: url ?? "" }],
     };
     setPopUpOpen(tipo);
   };

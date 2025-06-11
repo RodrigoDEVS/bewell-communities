@@ -137,7 +137,9 @@ export default function LittleForm({
                   customSize="small"
                   style={{ fontSize: 14 }}
                   value={formData.estado}
-                  onChange={(value) => handleInputChange("estado", value)}
+                  onChange={(value) =>
+                    handleInputChange("estado", value as string)
+                  }
                   disabled={disabled}
                   placeholder="Seleccionar estado..."
                 />

@@ -2,7 +2,7 @@
 
 import type React from "react";
 
-interface SelectOption {
+export interface SelectOption {
   id: string | number;
   value: string;
   label: string;
@@ -13,7 +13,8 @@ interface SelectProps
   options: SelectOption[];
   customSize?: "small" | "medium" | "large";
   placeholder?: string;
-  onChange?: (value: string) => void;
+  onChange?: (value: string | SelectOption | null) => void;
+  returnObject?: boolean;
 }
 
 function SelectImproved(props: SelectProps) {
@@ -22,12 +23,20 @@ function SelectImproved(props: SelectProps) {
     customSize = "large",
     placeholder = "Select...",
     onChange,
+    returnObject = false,
     ...rest
   } = props;
 
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedValue = e.target.value;
     if (onChange) {
-      onChange(e.target.value);
+      if (returnObject) {
+        const selectedOption =
+          options.find((opt) => opt.value === selectedValue) || null;
+        onChange(selectedOption);
+      } else {
+        onChange(selectedValue);
+      }
     }
   };
 
@@ -42,7 +51,7 @@ function SelectImproved(props: SelectProps) {
       <option value="">{placeholder}</option>
 
       {options.map((option) => (
-        <option key={option.id} value={option.value}>
+        <option key={`${option.id}-${option.value}`} value={option.value}>
           {option.label}
         </option>
       ))}

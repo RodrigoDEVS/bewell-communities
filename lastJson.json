@@ -1,0 +1,118 @@
+[
+  {
+    "tipo": "imagen",
+    "url": "https://firebasestorage.googleapis.com/v0/b/bewell-desarrollo.appspot.com/o/2.%20Imagen%20principal%20dentro%20del%20servicio%20Claro%20Telefoni%CC%81a.png?alt=media&token=1ca482e8-2a10-49a6-ae43-5302181b80e4",
+    "estilo": { "width": 150, "height": 150, "borderRadius": 12 }
+  },
+  {
+    "tipo": "label",
+    "texto": "Torneos Deportivos",
+    "estilo": { "fontSize": 22.0, "fontWeight": "bold", "color": "#000000" }
+  },
+  {
+    "tipo": "label",
+    "texto": "Bienvenidos",
+    "estilo": {
+      "fontSize": 17.0,
+      "fontWeight": "bold",
+      "color": "#000000",
+      "alineacion": "justify"
+    }
+  },
+  {
+    "tipo": "label",
+    "texto": "Porque queremos generar espacios la salud física y mental, el aprovechamiento del tiempo libre, la integración y la sana competencia de cada uno de los participantes de la organización. Te invitamos a formar parte de los Torneos Deportivos Davivienda.",
+    "estilo": {
+      "fontSize": 15.0,
+      "fontWeight": "normal",
+      "color": "#000000",
+      "alineacion": "centro"
+    }
+  },
+  { "tipo": "divider" },
+  {
+    "tipo": "label",
+    "texto": "Información torneo",
+    "estilo": { "fontSize": 20.0, "fontWeight": "bold", "color": "#000000" }
+  },
+
+  {
+    "tipo": "label_link",
+    "label": "Consulta la información adicional del torneo aquí",
+    "url": "https://www.ejemplo.com/terminos"
+  },
+
+  { "tipo": "divider" },
+  {
+    "tipo": "label",
+    "texto": "Inscríbete aquí",
+    "estilo": { "fontSize": 20.0, "fontWeight": "bold", "color": "#000000" }
+  },
+
+  {
+    "tipo": "input",
+    "id": "correo",
+    "label": "Correo",
+    "inputType": "correo",
+    "requerido": true
+  },
+  {
+    "tipo": "input",
+    "id": "numero",
+    "label": "Número de identificación",
+    "inputType": "numero",
+    "formato": "none",
+    "requerido": true
+  },
+  {
+    "tipo": "input",
+    "id": "nombre",
+    "label": "Nombre completo",
+    "inputType": "text",
+    "formato": "uppercase",
+    "requerido": true
+  },
+  {
+    "tipo": "input",
+    "id": "telefono",
+    "label": "Nombre de celular",
+    "inputType": "telefono",
+    "formato": "none",
+    "requerido": true
+  },
+  {
+    "tipo": "input",
+    "id": "nombreequipo",
+    "label": "Nombre del equipo",
+    "inputType": "text",
+    "formato": "uppercase",
+    "requerido": true
+  },
+  { "tipo": "divider" },
+  {
+    "tipo": "label",
+    "texto": "Términos y condiciones",
+    "estilo": { "fontSize": 20.0, "fontWeight": "bold", "color": "#000000" },
+    "requerido": true
+  },
+  {
+    "tipo": "checkbox",
+    "id": "acepta_terminos",
+    "label": "Certifico y acepto que leí todas las condiciones del Torneo Voleibol mixto  para la participación.",
+    "requerido": true
+  },
+  { "tipo": "divider" },
+  {
+    "tipo": "medio_pago",
+    "max_bewins": 5,
+    "valor_unitario": 10000,
+    "valor_en_pesos": 500000,
+    "consideraciones": "Podrás inscribirte al aceptar términos y condiciones",
+    "requerido": true
+  },
+  {
+    "tipo": "button",
+    "texto": "Pagar",
+    "accion": { "tipo": "navegar", "ruta": "/confirmacionPago" }
+  }
+]
