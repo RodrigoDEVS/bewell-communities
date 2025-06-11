@@ -32,7 +32,10 @@ export default function TorneosPreview() {
             const key = `${item.tipo}-${generateId()}`;
 
             return (
-              <div key={key} className="relative group">
+              <div
+                key={key}
+                className="relative group items-center justify-center flex flex-col space-y-2"
+              >
                 <button
                   className="absolute -top-2 -right-2 z-10 bg-red-500 hover:bg-red-600 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200 shadow-lg"
                   aria-label="delete-component"
@@ -76,16 +79,14 @@ export default function TorneosPreview() {
                   if (item.tipo === "imagen") {
                     return (
                       <div
-                        className="flex items-center justify-center font-bold text-lg"
+                        className="overflow-hidden rounded-lg h-[240px] w-[310px]"
                         key={key}
                       >
-                        <div className="overflow-hidden rounded-lg">
-                          <img
-                            className="h-90 w-70 object-cover"
-                            src={item.url}
-                            alt=""
-                          />
-                        </div>
+                        <img
+                          className="h-full w-full object-cover"
+                          src={item.url}
+                          alt=""
+                        />
                       </div>
                     );
                   }
@@ -93,7 +94,7 @@ export default function TorneosPreview() {
                   if (item.tipo === "divider") {
                     return (
                       <div
-                        className="border-b border-gray-300 my-2"
+                        className="border-b border-gray-300 my-2 w-full"
                         key={key}
                       ></div>
                     );
