@@ -5,14 +5,13 @@ import ImageCarousel from "../molecules/ImageCarousel";
 import { Trash2 } from "lucide-react";
 
 export default function TorneosPreview() {
-  const { componentes, removeComponent } = useTorneosStore();
+  const { componentes, removeComponent, crearTorneo } = useTorneosStore();
 
   const onSubmit = () => {
-    // Aquí puedes manejar la lógica de guardado
-    console.log(JSON.stringify(componentes));
+    crearTorneo();
   };
 
-  // Nuevo: Función para eliminar un componente por índice
+  // Función para eliminar un componente por índice
   const handleDeleteComponent = (indexToDelete: number) => {
     removeComponent(indexToDelete);
   };

@@ -1,3 +1,18 @@
+export interface TorneosContainer {
+  ser_id: number;
+  cas_id: number;
+  cas_img_url: string;
+  cas_titulo: string;
+  cas_subtitulo: string;
+  cas_url_contenido: string;
+  cas_url_info: string;
+  cas_fecha_inicio: string | null;
+  cas_fecha_fin: string | null;
+  cas_estado: string;
+  cas_tipo: string;
+  cas_contenido_pantalla: TorneosData[];
+}
+
 export interface TorneosData {
   id?: string;
   tipo:
