@@ -1,16 +1,13 @@
 "use client";
-import SearchBar from "../molecules/SearchBar";
-import ComunidadesToolbar from "../molecules/ComunidadesToolbar";
-import ComunidadesTable from "../organisms/ComunidadesTable";
 import TorneosComponents from "../organisms/TorneosComponents";
 import TorneosPreview from "../organisms/TorneosPreview";
 import { ComponentsPopUp } from "../organisms/torneos/ComponentsPopUp";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTorneosStore } from "@/app/store/useTorneosStore";
 import { TorneosData } from "@/app/types/torneos";
 
 export default function TorneosTemplate() {
-  const { addComponent } = useTorneosStore();
+  const { addComponent, getTorneoInfo } = useTorneosStore();
 
   const [showComponentsPopUp, setShowLabelPopUp] = useState<boolean>(false);
   const [componentType, setComponentType] =
@@ -24,6 +21,10 @@ export default function TorneosTemplate() {
   function handleClosePopUp() {
     setShowLabelPopUp(false);
   }
+
+  useEffect(() => {
+    getTorneoInfo("B11DbzFQsO");
+  }, []);
 
   return (
     <div className="h-screen flex flex-col">
