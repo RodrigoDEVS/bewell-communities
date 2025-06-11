@@ -6,11 +6,8 @@ interface TorneosState {
 
   // Acciones
   addComponent: (componente: TorneosData) => void;
-  //removeComponent: (id: number) => void;
+  removeComponent: (index: number) => void;
 }
-
-// Función para generar IDs únicos
-//const generateId = () => Math.random();
 
 export const useTorneosStore = create<TorneosState>((set, get) => ({
   componentes: [],
@@ -23,11 +20,12 @@ export const useTorneosStore = create<TorneosState>((set, get) => ({
     }));
   },
 
-  // removeComponent: (id) => {
-  //   set((state) => ({
-  //     componentes: [
-  //       ...state.componentes.filter((element) => element.id !== id),
-  //     ],
-  //   }));
-  // },
+  removeComponent: (index) => {
+    set((state) => ({
+      componentes: [
+        ...state.componentes.filter((_, i) => i !== index),
+        // Elimina el componente en el índice especificado
+      ],
+    }));
+  },
 }));
