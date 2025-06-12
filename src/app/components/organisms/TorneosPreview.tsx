@@ -3,6 +3,7 @@ import React from "react";
 import Button from "../atoms/Button";
 import ImageCarousel from "../molecules/ImageCarousel";
 import { Loader2, Trash2 } from "lucide-react";
+import Select from "../atoms/Select";
 
 export default function TorneosPreview() {
   const { componentes, loading, removeComponent, updateTorneoComponents } =
@@ -146,7 +147,7 @@ export default function TorneosPreview() {
                             <input
                               type="checkbox"
                               id={`checkbox-${index}`}
-                              className="h-4 w-4 border-gray-300 rounded focus:ring-blue-500"
+                              className="h-4 w-4 border-gray-300 rounded focus:ring-blue-500 accent-red-500"
                             />
                             <label
                               htmlFor={`checkbox-${index}`}
@@ -161,38 +162,27 @@ export default function TorneosPreview() {
                       if (item.tipo === "medio_pago") {
                         return (
                           <div
-                            className="w-[250px] mx-auto items-center justify-center flex flex-col space-y-2 border border-gray-300 rounded-lg p-2"
+                            className="w-[280px] mx-auto items-center justify-center flex flex-col space-y-2 p-2"
                             key={key}
                           >
                             <div className="flex items-center justify-center text-base font-bold mb-2 w-full">
                               <span>Medio de pago</span>
                             </div>
-                            <div className="flex items-center justify-between space-x-2 w-full">
-                              <label
-                                htmlFor={`descuento_nomina-${index}`}
-                                className="text-sm"
-                              >
-                                Descuento Nómina
-                              </label>
-                              <input
-                                type="checkbox"
-                                id={`descuento_nomina-${index}`}
-                                className="h-4 w-4 border-gray-300 rounded focus:ring-blue-500"
-                              />
-                            </div>
-                            <div className="flex items-center justify-between space-x-2 w-full">
-                              <label
-                                htmlFor={`bewins-${index}`}
-                                className="text-sm"
-                              >
-                                Pagar con Bewins
-                              </label>
-                              <input
-                                type="checkbox"
-                                id={`bewins-${index}`}
-                                className="h-4 w-4 border-gray-300 rounded focus:ring-blue-500"
-                              />
-                            </div>
+                            {item.mostrar_pago_bewins && (
+                              <div className="flex items-center justify-left space-x-20 w-full">
+                                <input
+                                  type="checkbox"
+                                  id={`bewins-${index}`}
+                                  className="h-4 w-4 border-gray-300 rounded focus:ring-blue-500 accent-red-500"
+                                />
+                                <label
+                                  htmlFor={`bewins-${index}`}
+                                  className="text-sm"
+                                >
+                                  Pagar con Bewins
+                                </label>
+                              </div>
+                            )}
                             <div className="relative w-full mt-2">
                               <input
                                 id={`input-${index}`}
@@ -203,13 +193,89 @@ export default function TorneosPreview() {
                               />
                               <label
                                 htmlFor={`input-${index}`}
-                                className="absolute left-3 -top-2.5 bg-white px-1 text-xs text-gray-500 peer-placeholder-shown:top-2 peer-placeholder-shown:text-sm peer-placeholder-shown:text-gray-400 transition-all duration-200"
+                                className="absolute left-3 -top-2.5 bg-white px-1 text-xs text-red-500 peer-placeholder-shown:top-2 peer-placeholder-shown:text-sm peer-placeholder-shown:text-red-400 transition-all duration-200"
                                 style={{ pointerEvents: "none" }}
                               >
                                 {`Cantidad de Bewins [máx. ${
                                   item.max_bewins || 0
                                 }]`}
                               </label>
+                            </div>
+                            {item.mostrar_descuento_nomina && (
+                              <div className="flex items-center justify-left space-x-20 w-full">
+                                <input
+                                  type="checkbox"
+                                  id={`descuento_nomina-${index}`}
+                                  className="h-4 w-4 border-gray-300 rounded focus:ring-blue-500 accent-red-500"
+                                />
+                                <label
+                                  htmlFor={`descuento_nomina-${index}`}
+                                  className="text-sm"
+                                >
+                                  Descuento Nómina
+                                </label>
+                              </div>
+                            )}
+                            {item.mostrar_pago_epayco && (
+                              <div className="flex items-center justify-left space-x-20 w-full">
+                                <input
+                                  type="checkbox"
+                                  id={`descuento_nomina-${index}`}
+                                  className="h-4 w-4 border-gray-300 rounded focus:ring-blue-500 accent-red-500"
+                                />
+                                <label
+                                  htmlFor={`descuento_nomina-${index}`}
+                                  className="text-sm"
+                                >
+                                  Pagar con Epayco
+                                </label>
+                              </div>
+                            )}
+                            <div className="flex items-center justify-center space-x-2 w-full flex-col">
+                              <span className="text-sm font-bold">
+                                Selecciona número de cuotas:
+                              </span>
+                              <Select
+                                className="w-[80px] h-[30px] text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                value={"1"}
+                                disabled
+                                options={[{ label: "1", value: "1", id: "1" }]}
+                              />
+                            </div>
+                            {/* divider */}
+                            <div
+                              className="border-b border-gray-300 my-2 w-full"
+                              key={key}
+                            ></div>
+                            <div className="flex items-center justify-center space-x-2 w-full mb-0">
+                              <span className="text-sm font-bold">
+                                Valor original:
+                              </span>
+                              <span className="text-sm font-bold">
+                                {`$${Intl.NumberFormat("es-CO").format(
+                                  item.valor_en_pesos ?? 0
+                                )}`}
+                              </span>
+                            </div>
+                            <div className="flex items-center justify-center space-x-2 w-full flex-col mb-1">
+                              <span className="text-sm ">
+                                Cuotas seleccionadas: 1
+                              </span>
+                            </div>
+                            <div className="flex items-center justify-center space-x-2 w-full">
+                              <span className="text-sm font-bold text-green-500">
+                                Total por cuota:
+                              </span>
+                              <span className="text-sm font-bold text-green-500">
+                                {`$${Intl.NumberFormat("es-CO").format(
+                                  item.valor_en_pesos ?? 0
+                                )}`}
+                              </span>
+                            </div>
+                            <div className="flex items-center justify-center w-full">
+                              <span className="text-xs">
+                                {item.consideraciones ?? ""}
+                              </span>
                             </div>
                           </div>
                         );

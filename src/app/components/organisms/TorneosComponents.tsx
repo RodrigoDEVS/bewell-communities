@@ -49,7 +49,7 @@ export default function TorneosComponents({
           <input
             type="checkbox"
             id="checkbox-example"
-            className="h-4 w-4 border-gray-300 rounded focus:ring-blue-500"
+            className="h-4 w-4 border-gray-300 rounded focus:ring-blue-500 accent-red-500"
             checked
             onChange={() => {}}
           />
@@ -63,7 +63,7 @@ export default function TorneosComponents({
           <input
             type="checkbox"
             id="checkbox-nomina"
-            className="h-4 w-4 border-gray-300 rounded focus:ring-blue-500"
+            className="h-4 w-4 border-gray-300 rounded focus:ring-blue-500 accent-red-500"
             checked
             onChange={() => {}}
           />
@@ -75,7 +75,7 @@ export default function TorneosComponents({
           <input
             type="checkbox"
             id="checkbox-bewins"
-            className="h-4 w-4 border-gray-300 rounded focus:ring-blue-500"
+            className="h-4 w-4 border-gray-300 rounded focus:ring-blue-500 accent-red-500"
             checked
             onChange={() => {}}
           />
@@ -87,7 +87,7 @@ export default function TorneosComponents({
           <input
             type="checkbox"
             id="checkbox-epayco"
-            className="h-4 w-4 border-gray-300 rounded focus:ring-blue-500"
+            className="h-4 w-4 border-gray-300 rounded focus:ring-blue-500 accent-red-500"
             checked
             onChange={() => {}}
           />

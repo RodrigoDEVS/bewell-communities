@@ -109,7 +109,7 @@
     "valor_en_pesos": 500000,
     "consideraciones": "Podrás inscribirte al aceptar términos y condiciones",
     "mostrar_pago_bewins": true,
-    "mostrar_descuento_nomina": true,
+    "mostrar_descuento_nomina": false,
     "mostrar_pago_epayco": true,
     "requerido": true
   },
