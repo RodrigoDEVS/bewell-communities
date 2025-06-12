@@ -3,12 +3,19 @@ import React, { useMemo } from "react";
 import Button from "../atoms/Button";
 import Select from "../atoms/Select";
 import { useComunidadesStore } from "@/app/store/useComunidadesStore";
-import { useComunidades } from "@/app/api/queries/comunidades";
+import {
+  useActualizarComunidades,
+  useComunidades,
+} from "@/app/api/queries/comunidades";
 import { useRouter } from "next/navigation";
+import { EstadoGeneral } from "@/app/types/enums";
 
 const ComunidadesToolbar = () => {
   // Obtenemos las comunidades usando React Query (solo para contar el total)
   const { data: comunidades } = useComunidades();
+
+  const actualizarComunidades = useActualizarComunidades();
+
   const {
     selectedRows,
     estados,
@@ -31,6 +38,33 @@ const ComunidadesToolbar = () => {
     downloadListado(filteredComunidades);
   };
 
+  const handleSelectedCommunities = async (nuevoEstado: string) => {
+    // Filtrar las comunidades seleccionadas
+    const comunidadesSeleccionadas = comunidades!.filter((c) =>
+      selectedRows.includes(c.com_id!)
+    );
+    // Actualizar el estado en cada objeto
+    const comunidadesActualizadas = comunidadesSeleccionadas.map((c) => ({
+      ...c,
+      com_status:
+        nuevoEstado === "ACTIVO"
+          ? EstadoGeneral.ACTIVO
+          : EstadoGeneral.INACTIVO,
+      ContenidoAdicionalComunidades: c.ContenidoAdicionalComunidades
+        ? c.ContenidoAdicionalComunidades.map((contenido) => {
+            // Convertir el estado del contenido a enum y eliminar com_id
+            const { com_id, ...rest } = contenido;
+            return {
+              ...rest,
+            };
+          })
+        : [],
+    }));
+
+    // Llamar a la mutación
+    await actualizarComunidades.mutateAsync(comunidadesActualizadas);
+  };
+
   return (
     <div className="flex items-center justify-between space-x-4 p-4 ml-20">
       <>
@@ -44,13 +78,10 @@ const ComunidadesToolbar = () => {
             <Select
               options={estados}
               customSize="small"
-              onChange={(e) => {
-                // const value = e.target.value;
-                // if (value === "") return;
-                // editEstadoComunidades(
-                //   selectedRows,
-                //   value as "Activo" | "Inactivo"
-                // );
+              onChange={(value) => {
+                const newValue = value;
+                if (value === "") return;
+                handleSelectedCommunities(value as string);
               }}
             />
 

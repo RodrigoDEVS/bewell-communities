@@ -1,0 +1,49 @@
+{
+  "infoService": {
+    "timestamp": "6/10/2025",
+    "host": "/users/pantalla-dinamica/find-all",
+    "method": "POST"
+  },
+  "status": {
+    "code": 201,
+    "message": "Operation Successfully"
+  },
+  "responsePayload": {
+    "result": true,
+    "data": [
+      {
+        "ser_id": 97,
+        "cas_id": 97,
+        "cas_img_url": "https://example.com/image.png",
+        "cas_titulo": "Título de ejemplo",
+        "cas_subtitulo": "Subtítulo de ejemplo",
+        "cas_url_contenido": "https://example.com/content",
+        "cas_url_info": "ejemplo",
+        "cas_fecha_inicio": null,
+        "cas_fecha_fin": null,
+        "cas_estado": "Activo",
+        "cas_tipo": "page",
+        "cas_contenido_pantalla": [
+          {
+            "tipo": "imagen",
+            "url": "https://example.com/image.png",
+            "estilo": {
+              "width": 150,
+              "height": 150,
+              "borderRadius": 12
+            }
+          },
+          {
+            "tipo": "imagen",
+            "url": "https://example.com/image.png",
+            "estilo": {
+              "width": 150,
+              "height": 150,
+              "borderRadius": 12
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,115 @@
+[
+  {
+    "tipo": "imagen",
+    "url": "https://firebasestorage.googleapis.com/v0/b/bewell-desarrollo.appspot.com/o/2.%20Imagen%20principal%20dentro%20del%20servicio%20Claro%20Telefoni%CC%81a.png?alt=media&token=1ca482e8-2a10-49a6-ae43-5302181b80e4",
+    "estilo": { "width": 150, "height": 150, "borderRadius": 12 }
+  },
+  {
+    "tipo": "label",
+    "texto": "Torneos Deportivos",
+    "estilo": { "fontSize": 22.0, "fontWeight": "bold", "color": "#000000" }
+  },
+  {
+    "tipo": "input",
+    "id": "nombre_participante",
+    "label": "Nombre del Participante",
+    "placeholder": "Ingresa tu nombre completo"
+  },
+  {
+    "tipo": "dropdown",
+    "id": "torneo",
+    "placeholder": "Selecciona el torneo",
+    "opciones": [
+      { "nombre": "Fútbol", "valor": 10000 },
+      { "nombre": "Natación", "valor": 18000 },
+      { "nombre": "Bolos", "valor": 27000 },
+      { "nombre": "Patinaje", "valor": 32000 },
+      { "nombre": "Tenis", "valor": 35000 },
+      { "nombre": "Voleibol", "valor": 36000 }
+    ]
+  },
+  {
+    "tipo": "checkbox",
+    "id": "acepta_terminos",
+    "label": "Acepto los términos y condiciones"
+  },
+  { "tipo": "count", "id": "numero_invitados", "max": 10 },
+  {
+    "tipo": "label",
+    "texto": "1 Bewin",
+    "estilo": { "fontSize": 24.0, "fontWeight": "bold", "color": "#D60000" }
+  },
+  {
+    "tipo": "label",
+    "texto": "Tope para este beneficio: 1 Bewin\nTengo: 160 Bewins",
+    "estilo": { "fontSize": 14.0, "fontWeight": "normal", "color": "#000000" }
+  },
+  {
+    "tipo": "label",
+    "texto": "Medio de pago",
+    "estilo": { "fontSize": 16.0, "fontWeight": "bold", "color": "#000000" }
+  },
+  {
+    "tipo": "radio",
+    "id": "pago",
+    "opciones": ["Tarjeta Crédito", "Descuento Nómina"]
+  },
+  {
+    "tipo": "dropdown",
+    "id": "cuotas",
+    "placeholder": "#Cuotas",
+    "opciones": ["1", "2", "3", "4"]
+  },
+  {
+    "tipo": "medio_pago",
+    "max_bewins": 5,
+    "consideraciones": "Este beneficio solo está disponible durante mayo."
+  },
+  {
+    "tipo": "button",
+    "texto": "Pagar",
+    "accion": { "tipo": "navegar", "ruta": "/confirmacionPago" }
+  },
+  {
+    "tipo": "carousel",
+    "imagenes": [
+      {
+        "url": "https://firebasestorage.googleapis.com/v0/b/bewell-desarrollo.appspot.com/o/2.%20Imagen%20principal%20dentro%20del%20servicio%20Claro%20Telefoni%CC%81a.png?alt=media&token=1ca482e8-2a10-49a6-ae43-5302181b80e4",
+        "link": "/promo1"
+      },
+      {
+        "url": "https://firebasestorage.googleapis.com/v0/b/bewell-desarrollo.appspot.com/o/2.%20Imagen%20principal%20dentro%20del%20servicio%20Claro%20Telefoni%CC%81a.png?alt=media&token=1ca482e8-2a10-49a6-ae43-5302181b80e4",
+        "link": "https://paginaexterna.com"
+      }
+    ],
+    "estilo": { "alto": 180, "borderRadius": 20.0 }
+  },
+  {
+    "tipo": "card",
+    "titulo": "Beneficio Salud",
+    "descripcion": "Accede a descuentos en salud",
+    "imagen": "https://firebasestorage.googleapis.com/v0/b/bewell-desarrollo.appspot.com/o/2.%20Imagen%20principal%20dentro%20del%20servicio%20Claro%20Telefoni%CC%81a.png?alt=media&token=1ca482e8-2a10-49a6-ae43-5302181b80e4",
+    "accion": { "tipo": "navegar", "ruta": "/detalleSalud" },
+    "estilo": { "alto": 150, "ancho": 300, "borderRadius": 15 }
+  },
+  {
+    "tipo": "switch",
+    "id": "acepta_terminos",
+    "texto": "Acepto los términos y condiciones"
+  },
+  {
+    "tipo": "slider",
+    "id": "nivel_energia",
+    "min": 0,
+    "max": 10,
+    "valorInicial": 5,
+    "divisions": 10,
+    "etiqueta": "Nivel de energía"
+  },
+  {
+    "tipo": "calendar",
+    "id": "fecha_nacimiento",
+    "label": "Fecha de Nacimiento",
+    "placeholder": "Selecciona tu fecha"
+  }
+]
