@@ -58,38 +58,50 @@ export default function TorneosComponents({
           </label>
         </div>
       </TorneosComponent>
-      <TorneosComponent tipo="button" setPopUpOpen={setLabelPopUpOpen}>
-        <Button variant="rounded" size="medium">
-          Botón
-        </Button>
-      </TorneosComponent>
       <TorneosComponent tipo="medio_pago" setPopUpOpen={setLabelPopUpOpen}>
         <div className="flex items-center space-x-2">
           <input
             type="checkbox"
-            id="checkbox-example"
+            id="checkbox-nomina"
             className="h-4 w-4 border-gray-300 rounded focus:ring-blue-500"
             checked
             onChange={() => {}}
           />
-          <label htmlFor="checkbox-example" className="text-sm">
+          <label htmlFor="checkbox-nomina" className="text-sm">
             Nómina
           </label>
         </div>
         <div className="flex items-center space-x-2">
           <input
             type="checkbox"
-            id="checkbox-example"
+            id="checkbox-bewins"
             className="h-4 w-4 border-gray-300 rounded focus:ring-blue-500"
             checked
             onChange={() => {}}
           />
-          <label htmlFor="checkbox-example" className="text-sm">
+          <label htmlFor="checkbox-bewins" className="text-sm">
             Bewins
           </label>
         </div>
+        <div className="flex items-center space-x-2">
+          <input
+            type="checkbox"
+            id="checkbox-epayco"
+            className="h-4 w-4 border-gray-300 rounded focus:ring-blue-500"
+            checked
+            onChange={() => {}}
+          />
+          <label htmlFor="checkbox-epayco" className="text-sm">
+            Epayco
+          </label>
+        </div>
       </TorneosComponent>
-      <TorneosComponent tipo="switch" setPopUpOpen={setLabelPopUpOpen} />
+      <TorneosComponent tipo="button" setPopUpOpen={setLabelPopUpOpen}>
+        <Button variant="rounded" size="medium">
+          Botón
+        </Button>
+      </TorneosComponent>
+      {/* <TorneosComponent tipo="switch" setPopUpOpen={setLabelPopUpOpen} />
       <TorneosComponent tipo="carousel" setPopUpOpen={setLabelPopUpOpen}>
         <div className="overflow-hidden rounded-lg flex space-x-2">
           <div className="overflow-hidden rounded-lg">
@@ -114,7 +126,7 @@ export default function TorneosComponents({
             />
           </div>
         </div>
-      </TorneosComponent>
+      </TorneosComponent> */}
     </div>
   );
 }

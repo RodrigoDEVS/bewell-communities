@@ -46,6 +46,9 @@ export interface TorneosData {
   valor_unitario?: number;
   valor_en_pesos?: number;
   consideraciones?: string;
+  mostrar_pago_bewins?: boolean;
+  mostrar_descuento_nomina?: boolean;
+  mostrar_pago_epayco?: boolean;
 }
 
 interface Imagenes {

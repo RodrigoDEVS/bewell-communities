@@ -23,11 +23,10 @@ export const torneosService = {
   async updateTorneoComponents(
     torneoId: string,
     componentes: TorneosData[]
-  ): Promise<TorneosContainer> {
+  ): Promise<any> {
     try {
       const url = `${process.env.NEXT_PUBLIC_BASE_URL}/_Product/${torneoId}`;
-      console.log("URL de la API:", url);
-      const response = await axios.put<TorneosContainer>(
+      const response = await axios.put<any>(
         url,
         { cas_contenido_pantalla: componentes },
         {
