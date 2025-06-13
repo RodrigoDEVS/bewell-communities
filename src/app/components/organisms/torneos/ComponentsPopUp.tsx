@@ -5,6 +5,8 @@ import { createPortal } from "react-dom";
 import Button from "../../atoms/Button";
 import { TorneosData } from "@/app/types/torneos";
 import Select, { SelectOption } from "../../atoms/Select";
+import Switch from "../../atoms/Switch";
+import { useTorneosStore } from "@/app/store/useTorneosStore";
 
 interface ComponentsPopUpProps {
   isOpen: boolean;
@@ -19,6 +21,8 @@ export const ComponentsPopUp = ({
   onAdd,
   onClose,
 }: ComponentsPopUpProps) => {
+  const { selectedComponent, cleanSelectedComponent, updateSelectedComponent } =
+    useTorneosStore();
   // Estados para los diferentes tipos de formularios
   const [labelText, setLabelText] = useState("");
   const [labelOption, setLabelOption] = useState("");
@@ -27,14 +31,79 @@ export const ComponentsPopUp = ({
   const [image, setImage] = useState("");
   const [selectedInputOption, setSelectedInputOption] =
     useState<SelectOption | null>();
+  const [inputId, setInputId] = useState<string>("");
+  const [isRequired, setIsRequired] = useState<boolean>(false);
+  const [mostrarPagoBewins, setMostrarPagoBewins] = useState<boolean>(false);
+  const [mostrarDescuentoNomina, setMostrarDescuentoNomina] =
+    useState<boolean>(false);
+  const [mostrarPagoEpayco, setMostrarPagoEpayco] = useState<boolean>(false);
   const [maxBewins, setMaxBewins] = useState<number>(0);
   const [valorUnitario, setValorUnitario] = useState<number>(0);
   const [valorPesos, setValorPesos] = useState<number>(0);
+  const [accion, setAccion] = useState<string>("");
+  const [urlAction, setUrlAction] = useState<string>("");
+
+  useEffect(() => {
+    if (selectedComponent) {
+      setImage(
+        selectedComponent.tipo === "imagen" ? selectedComponent.url ?? "" : ""
+      );
+      setLabelText(
+        selectedComponent.tipo === "label" ||
+          selectedComponent.tipo === "button"
+          ? selectedComponent.texto ?? ""
+          : selectedComponent.tipo === "label_link" ||
+            selectedComponent.tipo === "input" ||
+            selectedComponent.tipo === "checkbox"
+          ? selectedComponent.label ?? ""
+          : selectedComponent.tipo === "medio_pago"
+          ? selectedComponent.consideraciones ?? ""
+          : ""
+      );
+      setLabelOption(
+        selectedComponent.estilo?.fontSize === 22.0
+          ? "Titulo"
+          : selectedComponent.estilo?.fontSize === 20.0
+          ? "Subtitulo"
+          : selectedComponent.estilo?.fontSize === 17.0
+          ? "Subtitulo2"
+          : "Contenido"
+      );
+      setUrlLink(
+        selectedComponent.tipo === "label_link"
+          ? selectedComponent.url ?? ""
+          : ""
+      );
+      setInputId(
+        selectedComponent.tipo === "input" ||
+          selectedComponent.tipo === "checkbox"
+          ? selectedComponent.id ?? ""
+          : ""
+      );
+      setSelectedInputOption(
+        inputOptions.find(
+          (option) => option.value === selectedComponent.inputType
+        ) ?? null
+      );
+      setIsRequired(selectedComponent.requerido ?? false);
+      setMostrarPagoBewins(selectedComponent.mostrar_pago_bewins ?? false);
+      setMostrarDescuentoNomina(
+        selectedComponent.mostrar_descuento_nomina ?? false
+      );
+      setMostrarPagoEpayco(selectedComponent.mostrar_pago_epayco ?? false);
+      setMaxBewins(selectedComponent.max_bewins ?? 0);
+      setValorUnitario(selectedComponent.valor_unitario ?? 0);
+      setValorPesos(selectedComponent.valor_en_pesos ?? 0);
+      setAccion(selectedComponent.accion?.tipo ?? "");
+      setUrlAction(selectedComponent.accion?.ruta ?? "");
+    }
+  }, [selectedComponent]);
 
   // Cerrar con la tecla Escape
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
+        clearFields();
         onClose();
       }
     };
@@ -57,19 +126,37 @@ export const ComponentsPopUp = ({
   const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
     // Cerrar solo si se hace click en el overlay, no en el contenido del modal
     if (e.target === e.currentTarget) {
+      clearFields();
       onClose();
     }
   };
 
-  function clearFields() {
+  const clearFields = () => {
     setLabelText("");
     setImage("");
     setCarouselImages(["", "", ""]);
-  }
+    setInputId("");
+    setIsRequired(false);
+    setLabelOption("");
+    setSelectedInputOption(null);
+    setAccion("");
+    setUrlAction("");
+    setMostrarPagoBewins(false);
+    setMostrarDescuentoNomina(false);
+    setMostrarPagoEpayco(false);
+    setMaxBewins(0);
+    setValorUnitario(0);
+    setValorPesos(0);
+    setUrlLink("");
+    cleanSelectedComponent();
+  };
+
   const handleClick = () => {
-    let newComponent: TorneosData = {
-      tipo: tipo,
-    };
+    let newComponent: TorneosData = selectedComponent
+      ? selectedComponent
+      : {
+          tipo: tipo,
+        };
 
     // Configurar el componente según el tipo
     if (tipo === "label") {
@@ -114,32 +201,35 @@ export const ComponentsPopUp = ({
     } else if (tipo === "input") {
       newComponent = {
         ...newComponent,
-        id: (selectedInputOption?.value as string) || "",
-        label: selectedInputOption?.label || "",
-        inputType: (selectedInputOption?.id as string) || "",
-        requerido: true,
+        id: inputId || "",
+        label: labelText || "",
+        inputType: (selectedInputOption?.value as string) || "",
+        requerido: isRequired,
       };
     } else if (tipo === "checkbox") {
       newComponent = {
         ...newComponent,
-        id: "acepta_terminos",
+        id: inputId,
         label: labelText,
+        requerido: true,
+      };
+    } else if (tipo === "medio_pago") {
+      newComponent = {
+        ...newComponent,
+        mostrar_pago_bewins: mostrarPagoBewins,
+        mostrar_descuento_nomina: mostrarDescuentoNomina,
+        mostrar_pago_epayco: mostrarPagoEpayco,
+        max_bewins: maxBewins,
+        valor_unitario: valorUnitario,
+        valor_en_pesos: valorPesos,
+        consideraciones: labelText,
         requerido: true,
       };
     } else if (tipo === "button") {
       newComponent = {
         ...newComponent,
         texto: labelText,
-        accion: { tipo: "navegar", ruta: "/confirmacionPago" },
-      };
-    } else if (tipo === "medio_pago") {
-      newComponent = {
-        ...newComponent,
-        max_bewins: maxBewins,
-        valor_unitario: valorUnitario,
-        valor_en_pesos: valorPesos,
-        consideraciones: labelText,
-        requerido: true,
+        accion: { tipo: accion, ruta: urlAction },
       };
     } else if (tipo === "carousel") {
       newComponent = {
@@ -150,7 +240,10 @@ export const ComponentsPopUp = ({
       };
     }
 
-    onAdd(newComponent);
+    selectedComponent
+      ? updateSelectedComponent(newComponent)
+      : onAdd(newComponent);
+
     clearFields();
     onClose();
   };
@@ -164,24 +257,23 @@ export const ComponentsPopUp = ({
 
   // Label Options
   const labelOptions = [
-    { value: "Titulo", label: "Titulo", id: "Titulo" },
-    { value: "Subtitulo", label: "Subtitulo", id: "Subtitulo" },
-    { value: "Subtitulo2", label: "Subtitulo2", id: "Subtitulo2" },
-    { value: "Contenido", label: "Contenido", id: "Contenido" },
+    { value: "Titulo", label: "Titulo (22px)", id: "Titulo" },
+    { value: "Subtitulo", label: "Subtitulo (20px)", id: "Subtitulo" },
+    { value: "Subtitulo2", label: "Subtitulo2 (17px)", id: "Subtitulo2" },
+    { value: "Contenido", label: "Contenido (15px)", id: "Contenido" },
   ];
 
-  // Input Options value = id, label = label, id = inputType
+  // Input Options value = inputType
   const inputOptions = [
     { value: "correo", label: "Correo", id: "correo" },
-    { value: "numero", label: "Número de identificación", id: "numero" },
-    { value: "nombre", label: "Nombre completo", id: "text" },
-    { value: "telefono", label: "Nombre de celular", id: "telefono" },
-    { value: "nombreequipo", label: "Nombre del equipo", id: "text" },
-    {
-      value: "nombre_participante",
-      label: "Nombre del Participante",
-      id: "text",
-    },
+    { value: "numero", label: "Numero", id: "numero" },
+    { value: "text", label: "Texto", id: "text" },
+    { value: "telefono", label: "Telefono", id: "telefono" },
+  ];
+
+  const accionesList = [
+    { value: "redirigir_app", label: "Redirigir App", id: "redirigir_app" },
+    { value: "redirigir_web", label: "Redirigir Web", id: "redirigir_web" },
   ];
 
   // Renderizar el contenido según el tipo
@@ -320,10 +412,10 @@ export const ComponentsPopUp = ({
             <h3 className="text-lg font-medium">Agregar Campo de Texto</h3>
             <div className="space-y-2">
               <label
-                htmlFor="labelText"
+                htmlFor="consideraciones"
                 className="block text-sm font-medium text-gray-700"
               >
-                Tipo
+                Tipo de Entrada
               </label>
               <Select
                 className="w-[250px] h-[35px] border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -332,11 +424,49 @@ export const ComponentsPopUp = ({
                 returnObject
                 onChange={(value) => {
                   if (value !== null) {
-                    console.log("Selected value:", JSON.stringify(value));
                     setSelectedInputOption(value as SelectOption);
                   }
                 }}
-              ></Select>
+              />
+            </div>
+            <div className="space-y-2">
+              <label
+                htmlFor="input_id"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Input Id
+              </label>
+              <input
+                type="text"
+                id="input_id"
+                value={inputId}
+                onChange={(e) => setInputId(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                placeholder="Ingrese el texto"
+              />
+            </div>
+            <div className="space-y-2">
+              <label
+                htmlFor="input_label"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Label
+              </label>
+              <input
+                type="text"
+                id="labelText"
+                value={labelText}
+                onChange={(e) => setLabelText(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                placeholder="Ingrese el texto"
+              />
+            </div>
+            <div>
+              <Switch
+                text="Obligatorio"
+                value={isRequired}
+                onChange={(value) => setIsRequired(value)}
+              />
             </div>
           </div>
         );
@@ -345,6 +475,22 @@ export const ComponentsPopUp = ({
         return (
           <div className="space-y-4">
             <h3 className="text-lg font-medium">Agregar Checkbox</h3>
+            <div className="space-y-2">
+              <label
+                htmlFor="checbox_id"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Checkbox Id
+              </label>
+              <input
+                type="text"
+                id="checbox_id"
+                value={inputId}
+                onChange={(e) => setInputId(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                placeholder="Ingrese el texto del checkbox"
+              />
+            </div>
             <div className="space-y-2">
               <label
                 htmlFor="labelText"
@@ -368,77 +514,102 @@ export const ComponentsPopUp = ({
         return (
           <div className="space-y-4">
             <h3 className="text-lg font-medium">Agregar Medio de Pago</h3>
-            <div className="space-y-2">
-              <label
-                htmlFor="consideraciones"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Consideraciones
-              </label>
-              <input
-                type="text"
-                id="consideraciones"
-                value={labelText}
-                onChange={(e) => setLabelText(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Ingrese el texto"
+            <div>
+              <Switch
+                text="Mostrar Pago con Bewins"
+                value={mostrarPagoBewins}
+                onChange={(value) => {
+                  setMostrarPagoBewins(value);
+                }}
+              />
+              <Switch
+                text="Mostrar Descuento Nómina"
+                value={mostrarDescuentoNomina}
+                onChange={(value) => {
+                  setMostrarDescuentoNomina(value);
+                }}
+              />
+              <Switch
+                text="Mostrar Pago Epayco"
+                value={mostrarPagoEpayco}
+                onChange={(value) => {
+                  setMostrarPagoEpayco(value);
+                }}
               />
             </div>
             <div className="space-y-2">
-              <label
-                htmlFor="max_bewins"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Max Bewins
-              </label>
-              <input
-                type="number"
-                id="max_bewins"
-                value={maxBewins}
-                onChange={(e) =>
-                  setMaxBewins(e.target.value ? parseInt(e.target.value) : 0)
-                }
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Ingrese el máximo de bewins"
-              />
-            </div>
-            <div className="space-y-2">
-              <label
-                htmlFor="valor_unitario"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Valor Unitario
-              </label>
-              <input
-                type="number"
-                id="valor_unitario"
-                value={valorUnitario}
-                onChange={(e) =>
-                  setValorUnitario(
-                    e.target.value ? parseInt(e.target.value) : 0
-                  )
-                }
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Ingrese el valor unitario"
-              />
-            </div>
-            <div className="space-y-2">
-              <label
-                htmlFor="valor_en_pesos"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Valor en Pesos
-              </label>
-              <input
-                type="number"
-                id="valor_en_pesos"
-                value={valorPesos}
-                onChange={(e) =>
-                  setValorPesos(e.target.value ? parseInt(e.target.value) : 0)
-                }
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Ingrese el texto"
-              />
+              <div>
+                <label
+                  htmlFor="max_bewins"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Valor Máximo de Bewins
+                </label>
+                <input
+                  type="number"
+                  id="max_bewins"
+                  value={maxBewins}
+                  onChange={(e) =>
+                    setMaxBewins(e.target.value ? parseInt(e.target.value) : 0)
+                  }
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="Ingrese el máximo de bewins"
+                />
+              </div>
+              <div>
+                <label
+                  htmlFor="valor_unitario"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Valor Unitario de Bewins
+                </label>
+                <input
+                  type="number"
+                  id="valor_unitario"
+                  value={valorUnitario}
+                  onChange={(e) =>
+                    setValorUnitario(
+                      e.target.value ? parseInt(e.target.value) : 0
+                    )
+                  }
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="Ingrese el valor unitario"
+                />
+              </div>
+              <div>
+                <label
+                  htmlFor="valor_en_pesos"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Valor en Pesos de la Inscripción
+                </label>
+                <input
+                  type="number"
+                  id="valor_en_pesos"
+                  value={valorPesos}
+                  onChange={(e) =>
+                    setValorPesos(e.target.value ? parseInt(e.target.value) : 0)
+                  }
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="Ingrese el texto"
+                />
+              </div>
+              <div>
+                <label
+                  htmlFor="consideraciones"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Datos a Tener en Cuenta
+                </label>
+                <input
+                  type="text"
+                  id="consideraciones"
+                  value={labelText}
+                  onChange={(e) => setLabelText(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="Ingrese el texto"
+                />
+              </div>
             </div>
           </div>
         );
@@ -462,6 +633,42 @@ export const ComponentsPopUp = ({
                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 placeholder="Ingrese el texto del botón"
               />
+            </div>
+            <div>
+              <h3 className="text-lg font-medium mb-4">Acciones</h3>
+              <div className="space-y-2">
+                <label
+                  htmlFor="acciones"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Seleccionar Acción
+                </label>
+                <Select
+                  options={accionesList}
+                  value={accion}
+                  onChange={(value) => {
+                    if (value !== "") {
+                      setAccion(value as string);
+                    }
+                  }}
+                />
+                <div className="space-y-2">
+                  <label
+                    htmlFor="urlAction"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Ruta
+                  </label>
+                  <input
+                    type="text"
+                    id="urlAction"
+                    value={urlAction}
+                    onChange={(e) => setUrlAction(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="Ingrese la ruta del botón"
+                  />
+                </div>
+              </div>
             </div>
           </div>
         );
@@ -513,7 +720,7 @@ export const ComponentsPopUp = ({
         {renderContent()}
         <div className="flex items-center justify-end mt-6">
           <Button variant="primary" onClick={handleClick}>
-            Agregar
+            {selectedComponent ? "Editar" : "Agregar"}
           </Button>
         </div>
       </div>

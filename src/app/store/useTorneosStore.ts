@@ -7,33 +7,26 @@ interface TorneosState {
   error: string | null;
   torneo: TorneosContainer | null;
   componentes: TorneosData[];
+  selectedComponent: TorneosData | null;
+  selectedIndex: number | null;
 
   // Acciones
   addComponent: (componente: TorneosData) => void;
   removeComponent: (index: number) => void;
-  crearTorneo: () => Promise<void>;
   getTorneoInfo: (id: string) => Promise<void>;
+  updateTorneoComponents: (torneoId: string) => Promise<void>;
+  setSelectedComponent: (index: number) => void;
+  cleanSelectedComponent: () => void;
+  updateSelectedComponent: (item: TorneosData) => void;
 }
 
 export const useTorneosStore = create<TorneosState>((set, get) => ({
   loading: false,
   error: null,
-  torneo: null, // Inicialmente no hay torneo cargado
-  // torneo: {
-  //   ser_id: 97,
-  //   cas_id: 97,
-  //   cas_img_url: "https://example.com/image.png",
-  //   cas_titulo: "Título de ejemplo",
-  //   cas_subtitulo: "Subtítulo de ejemplo",
-  //   cas_url_contenido: "https://example.com/content",
-  //   cas_url_info: "ejemplo",
-  //   cas_fecha_inicio: null,
-  //   cas_fecha_fin: null,
-  //   cas_estado: "Activo",
-  //   cas_tipo: "page",
-  //   cas_contenido_pantalla: [],
-  // },
+  torneo: null,
   componentes: [],
+  selectedComponent: null,
+  selectedIndex: null,
 
   addComponent: (componente) => {
     const newComponent: TorneosData = componente;
@@ -49,20 +42,6 @@ export const useTorneosStore = create<TorneosState>((set, get) => ({
         // Elimina el componente en el índice especificado
       ],
     }));
-  },
-
-  crearTorneo: async () => {
-    const { componentes, torneo } = get();
-    if (torneo) {
-      const updatedTorneo: TorneosContainer = {
-        ...torneo,
-        cas_contenido_pantalla: componentes,
-      };
-      set({ torneo: updatedTorneo });
-      console.log(JSON.stringify(updatedTorneo));
-    } else {
-      console.error("No hay torneo cargado para crear.");
-    }
   },
 
   getTorneoInfo: async (id) => {
@@ -81,6 +60,48 @@ export const useTorneosStore = create<TorneosState>((set, get) => ({
       set({
         loading: false,
         error: "Error al obtener la información del torneo",
+      });
+    }
+  },
+
+  updateTorneoComponents: async (torneoId) => {
+    const { componentes } = get();
+    set({ loading: true, error: null });
+    try {
+      const response = await torneosService.updateTorneoComponents(
+        torneoId,
+        componentes
+      );
+      set({
+        loading: false,
+        error: null,
+      });
+    } catch (error) {
+      set({
+        loading: false,
+        error: "Error al actualizar los componentes del torneo",
+      });
+    }
+  },
+
+  setSelectedComponent: (index) => {
+    const { componentes } = get();
+    set({ selectedComponent: componentes[index], selectedIndex: index });
+  },
+
+  cleanSelectedComponent: () => {
+    set({ selectedComponent: null, selectedIndex: null });
+  },
+
+  updateSelectedComponent: (item: TorneosData) => {
+    const { selectedComponent, componentes, selectedIndex } = get();
+    const updatedComponents = [...componentes];
+    if (selectedComponent && selectedIndex !== null) {
+      updatedComponents[selectedIndex] = item;
+      set({
+        componentes: updatedComponents,
+        selectedComponent: null,
+        selectedIndex: null,
       });
     }
   },
