@@ -45,8 +45,21 @@ export const ComponentsPopUp = ({
 
   useEffect(() => {
     if (selectedComponent) {
-      setImage(selectedComponent.url ?? "");
-      setLabelText(selectedComponent.texto ?? "");
+      setImage(
+        selectedComponent.tipo === "imagen" ? selectedComponent.url ?? "" : ""
+      );
+      setLabelText(
+        selectedComponent.tipo === "label" ||
+          selectedComponent.tipo === "button"
+          ? selectedComponent.texto ?? ""
+          : selectedComponent.tipo === "label_link" ||
+            selectedComponent.tipo === "input" ||
+            selectedComponent.tipo === "checkbox"
+          ? selectedComponent.label ?? ""
+          : selectedComponent.tipo === "medio_pago"
+          ? selectedComponent.consideraciones ?? ""
+          : ""
+      );
       setLabelOption(
         selectedComponent.estilo?.fontSize === 22.0
           ? "Titulo"
@@ -56,6 +69,33 @@ export const ComponentsPopUp = ({
           ? "Subtitulo2"
           : "Contenido"
       );
+      setUrlLink(
+        selectedComponent.tipo === "label_link"
+          ? selectedComponent.url ?? ""
+          : ""
+      );
+      setInputId(
+        selectedComponent.tipo === "input" ||
+          selectedComponent.tipo === "checkbox"
+          ? selectedComponent.id ?? ""
+          : ""
+      );
+      setSelectedInputOption(
+        inputOptions.find(
+          (option) => option.value === selectedComponent.inputType
+        ) ?? null
+      );
+      setIsRequired(selectedComponent.requerido ?? false);
+      setMostrarPagoBewins(selectedComponent.mostrar_pago_bewins ?? false);
+      setMostrarDescuentoNomina(
+        selectedComponent.mostrar_descuento_nomina ?? false
+      );
+      setMostrarPagoEpayco(selectedComponent.mostrar_pago_epayco ?? false);
+      setMaxBewins(selectedComponent.max_bewins ?? 0);
+      setValorUnitario(selectedComponent.valor_unitario ?? 0);
+      setValorPesos(selectedComponent.valor_en_pesos ?? 0);
+      setAccion(selectedComponent.accion?.tipo ?? "");
+      setUrlAction(selectedComponent.accion?.ruta ?? "");
     }
   }, [selectedComponent]);
 
@@ -97,6 +137,7 @@ export const ComponentsPopUp = ({
     setCarouselImages(["", "", ""]);
     setInputId("");
     setIsRequired(false);
+    setLabelOption("");
     setSelectedInputOption(null);
     setAccion("");
     setUrlAction("");
@@ -111,9 +152,11 @@ export const ComponentsPopUp = ({
   };
 
   const handleClick = () => {
-    let newComponent: TorneosData = {
-      tipo: tipo,
-    };
+    let newComponent: TorneosData = selectedComponent
+      ? selectedComponent
+      : {
+          tipo: tipo,
+        };
 
     // Configurar el componente según el tipo
     if (tipo === "label") {
@@ -166,15 +209,9 @@ export const ComponentsPopUp = ({
     } else if (tipo === "checkbox") {
       newComponent = {
         ...newComponent,
-        id: "acepta_terminos",
+        id: inputId,
         label: labelText,
         requerido: true,
-      };
-    } else if (tipo === "button") {
-      newComponent = {
-        ...newComponent,
-        texto: labelText,
-        accion: { tipo: accion, ruta: urlAction },
       };
     } else if (tipo === "medio_pago") {
       newComponent = {
@@ -188,6 +225,12 @@ export const ComponentsPopUp = ({
         consideraciones: labelText,
         requerido: true,
       };
+    } else if (tipo === "button") {
+      newComponent = {
+        ...newComponent,
+        texto: labelText,
+        accion: { tipo: accion, ruta: urlAction },
+      };
     } else if (tipo === "carousel") {
       newComponent = {
         ...newComponent,
@@ -197,100 +240,12 @@ export const ComponentsPopUp = ({
       };
     }
 
-    onAdd(newComponent);
+    selectedComponent
+      ? updateSelectedComponent(newComponent)
+      : onAdd(newComponent);
+
     clearFields();
     onClose();
-  };
-
-  const handleUpdateSelected = () => {
-    if (selectedComponent) {
-      let updatedComponent: TorneosData = selectedComponent;
-
-      // Configurar el componente según el tipo
-      if (tipo === "label") {
-        updatedComponent = {
-          ...updatedComponent,
-          texto: labelText,
-          estilo:
-            labelOption === "Titulo"
-              ? { fontSize: 22.0, fontWeight: "bold", color: "#000000" }
-              : labelOption === "Subtitulo"
-              ? {
-                  fontSize: 20.0,
-                  fontWeight: "bold",
-                  color: "#000000",
-                }
-              : labelOption === "Subtitulo2"
-              ? {
-                  fontSize: 17.0,
-                  fontWeight: "bold",
-                  color: "#000000",
-                  alineacion: "centro",
-                }
-              : {
-                  fontSize: 15.0,
-                  fontWeight: "normal",
-                  color: "#000000",
-                  alineacion: "centro",
-                },
-        };
-      } else if (tipo === "imagen") {
-        updatedComponent = {
-          ...updatedComponent,
-          url: image,
-          estilo: { width: 150, height: 150, borderRadius: 12 },
-        };
-      } else if (tipo === "label_link") {
-        updatedComponent = {
-          ...updatedComponent,
-          label: labelText,
-          url: urlLink,
-        };
-      } else if (tipo === "input") {
-        updatedComponent = {
-          ...updatedComponent,
-          id: inputId || "",
-          label: labelText || "",
-          inputType: (selectedInputOption?.value as string) || "",
-          requerido: isRequired,
-        };
-      } else if (tipo === "checkbox") {
-        updatedComponent = {
-          ...updatedComponent,
-          id: "acepta_terminos",
-          label: labelText,
-          requerido: true,
-        };
-      } else if (tipo === "button") {
-        updatedComponent = {
-          ...updatedComponent,
-          texto: labelText,
-          accion: { tipo: accion, ruta: urlAction },
-        };
-      } else if (tipo === "medio_pago") {
-        updatedComponent = {
-          ...updatedComponent,
-          mostrar_pago_bewins: mostrarPagoBewins,
-          mostrar_descuento_nomina: mostrarDescuentoNomina,
-          mostrar_pago_epayco: mostrarPagoEpayco,
-          max_bewins: maxBewins,
-          valor_unitario: valorUnitario,
-          valor_en_pesos: valorPesos,
-          consideraciones: labelText,
-          requerido: true,
-        };
-      } else if (tipo === "carousel") {
-        updatedComponent = {
-          ...updatedComponent,
-          imagenes: carouselImages
-            .filter((url) => url.trim() !== "")
-            .map((url) => ({ url })),
-        };
-      }
-      updateSelectedComponent(updatedComponent);
-      clearFields();
-      onClose();
-    }
   };
 
   // Actualizar una imagen específica en el carrusel
@@ -522,6 +477,22 @@ export const ComponentsPopUp = ({
             <h3 className="text-lg font-medium">Agregar Checkbox</h3>
             <div className="space-y-2">
               <label
+                htmlFor="checbox_id"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Checkbox Id
+              </label>
+              <input
+                type="text"
+                id="checbox_id"
+                value={inputId}
+                onChange={(e) => setInputId(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                placeholder="Ingrese el texto del checkbox"
+              />
+            </div>
+            <div className="space-y-2">
+              <label
                 htmlFor="labelText"
                 className="block text-sm font-medium text-gray-700"
               >
@@ -748,10 +719,7 @@ export const ComponentsPopUp = ({
       <div className="bg-white p-6 rounded-lg shadow-lg relative w-[500px]">
         {renderContent()}
         <div className="flex items-center justify-end mt-6">
-          <Button
-            variant="primary"
-            onClick={selectedComponent ? handleUpdateSelected : handleClick}
-          >
+          <Button variant="primary" onClick={handleClick}>
             {selectedComponent ? "Editar" : "Agregar"}
           </Button>
         </div>
