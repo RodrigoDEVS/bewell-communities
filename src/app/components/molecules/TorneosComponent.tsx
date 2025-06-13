@@ -17,9 +17,6 @@ export default function TorneosComponent({
   setPopUpOpen,
 }: TorneosComponentProps) {
   const handleClick = () => {
-    const newComponent: TorneosData = {
-      tipo: tipo,
-    };
     setPopUpOpen(tipo);
   };
 

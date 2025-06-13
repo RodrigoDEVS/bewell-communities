@@ -7,12 +7,17 @@ interface TorneosState {
   error: string | null;
   torneo: TorneosContainer | null;
   componentes: TorneosData[];
+  selectedComponent: TorneosData | null;
+  selectedIndex: number | null;
 
   // Acciones
   addComponent: (componente: TorneosData) => void;
   removeComponent: (index: number) => void;
   getTorneoInfo: (id: string) => Promise<void>;
   updateTorneoComponents: (torneoId: string) => Promise<void>;
+  setSelectedComponent: (index: number) => void;
+  cleanSelectedComponent: () => void;
+  updateSelectedComponent: (item: TorneosData) => void;
 }
 
 export const useTorneosStore = create<TorneosState>((set, get) => ({
@@ -20,6 +25,8 @@ export const useTorneosStore = create<TorneosState>((set, get) => ({
   error: null,
   torneo: null,
   componentes: [],
+  selectedComponent: null,
+  selectedIndex: null,
 
   addComponent: (componente) => {
     const newComponent: TorneosData = componente;
@@ -73,6 +80,28 @@ export const useTorneosStore = create<TorneosState>((set, get) => ({
       set({
         loading: false,
         error: "Error al actualizar los componentes del torneo",
+      });
+    }
+  },
+
+  setSelectedComponent: (index) => {
+    const { componentes } = get();
+    set({ selectedComponent: componentes[index], selectedIndex: index });
+  },
+
+  cleanSelectedComponent: () => {
+    set({ selectedComponent: null, selectedIndex: null });
+  },
+
+  updateSelectedComponent: (item: TorneosData) => {
+    const { selectedComponent, componentes, selectedIndex } = get();
+    const updatedComponents = [...componentes];
+    if (selectedComponent && selectedIndex !== null) {
+      updatedComponents[selectedIndex] = item;
+      set({
+        componentes: updatedComponents,
+        selectedComponent: null,
+        selectedIndex: null,
       });
     }
   },

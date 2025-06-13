@@ -7,7 +7,7 @@ import { useTorneosStore } from "@/app/store/useTorneosStore";
 import { TorneosData } from "@/app/types/torneos";
 
 export default function TorneosTemplate() {
-  const { addComponent, getTorneoInfo } = useTorneosStore();
+  const { selectedComponent, addComponent, getTorneoInfo } = useTorneosStore();
 
   const [showComponentsPopUp, setShowLabelPopUp] = useState<boolean>(false);
   const [componentType, setComponentType] =
@@ -26,6 +26,12 @@ export default function TorneosTemplate() {
     getTorneoInfo("B11DbzFQsO");
   }, []);
 
+  useEffect(() => {
+    if (selectedComponent) {
+      setComponentType(selectedComponent.tipo);
+    }
+  }, [selectedComponent]);
+
   return (
     <div className="h-screen flex flex-col">
       <h1 className="flex-shrink text-2xl font-bold mb-2 flex items-center text-red-600">
@@ -37,7 +43,11 @@ export default function TorneosTemplate() {
           <TorneosComponents setLabelPopUpOpen={handleOpenLabelPopUp} />
         </div>
         <div className="flex-1">
-          <TorneosPreview />
+          <TorneosPreview
+            onClick={() => {
+              setShowLabelPopUp(true);
+            }}
+          />
         </div>
       </div>
       <ComponentsPopUp

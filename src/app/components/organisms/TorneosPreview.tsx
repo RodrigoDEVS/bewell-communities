@@ -4,10 +4,20 @@ import Button from "../atoms/Button";
 import ImageCarousel from "../molecules/ImageCarousel";
 import { Loader2, Trash2 } from "lucide-react";
 import Select from "../atoms/Select";
+import { TorneosData } from "@/app/types/torneos";
 
-export default function TorneosPreview() {
-  const { componentes, loading, removeComponent, updateTorneoComponents } =
-    useTorneosStore();
+interface TorneosPreviewProps {
+  onClick: () => void;
+}
+
+export default function TorneosPreview({ onClick }: TorneosPreviewProps) {
+  const {
+    componentes,
+    loading,
+    removeComponent,
+    updateTorneoComponents,
+    setSelectedComponent,
+  } = useTorneosStore();
 
   const onSubmit = () => {
     updateTorneoComponents("B11DbzFQsO");
@@ -44,11 +54,18 @@ export default function TorneosPreview() {
                   <div
                     key={key}
                     className="relative group items-center justify-center flex flex-col space-y-2"
+                    onClick={() => {
+                      setSelectedComponent(index);
+                      onClick();
+                    }}
                   >
                     <button
                       className="absolute -top-2 -right-2 z-10 bg-red-500 hover:bg-red-600 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200 shadow-lg"
                       aria-label="delete-component"
-                      onClick={() => handleDeleteComponent(index)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDeleteComponent(index);
+                      }}
                     >
                       <Trash2 size={12} />
                     </button>
@@ -273,7 +290,7 @@ export default function TorneosPreview() {
                               </span>
                             </div>
                             <div className="flex items-center justify-center w-full">
-                              <span className="text-xs">
+                              <span className="text-xs  text-center">
                                 {item.consideraciones ?? ""}
                               </span>
                             </div>

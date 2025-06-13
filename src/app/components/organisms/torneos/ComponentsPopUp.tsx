@@ -6,6 +6,7 @@ import Button from "../../atoms/Button";
 import { TorneosData } from "@/app/types/torneos";
 import Select, { SelectOption } from "../../atoms/Select";
 import Switch from "../../atoms/Switch";
+import { useTorneosStore } from "@/app/store/useTorneosStore";
 
 interface ComponentsPopUpProps {
   isOpen: boolean;
@@ -20,6 +21,8 @@ export const ComponentsPopUp = ({
   onAdd,
   onClose,
 }: ComponentsPopUpProps) => {
+  const { selectedComponent, cleanSelectedComponent, updateSelectedComponent } =
+    useTorneosStore();
   // Estados para los diferentes tipos de formularios
   const [labelText, setLabelText] = useState("");
   const [labelOption, setLabelOption] = useState("");
@@ -39,6 +42,22 @@ export const ComponentsPopUp = ({
   const [valorPesos, setValorPesos] = useState<number>(0);
   const [accion, setAccion] = useState<string>("");
   const [urlAction, setUrlAction] = useState<string>("");
+
+  useEffect(() => {
+    if (selectedComponent) {
+      setImage(selectedComponent.url ?? "");
+      setLabelText(selectedComponent.texto ?? "");
+      setLabelOption(
+        selectedComponent.estilo?.fontSize === 22.0
+          ? "Titulo"
+          : selectedComponent.estilo?.fontSize === 20.0
+          ? "Subtitulo"
+          : selectedComponent.estilo?.fontSize === 17.0
+          ? "Subtitulo2"
+          : "Contenido"
+      );
+    }
+  }, [selectedComponent]);
 
   // Cerrar con la tecla Escape
   useEffect(() => {
@@ -87,6 +106,8 @@ export const ComponentsPopUp = ({
     setMaxBewins(0);
     setValorUnitario(0);
     setValorPesos(0);
+    setUrlLink("");
+    cleanSelectedComponent();
   };
 
   const handleClick = () => {
@@ -179,6 +200,97 @@ export const ComponentsPopUp = ({
     onAdd(newComponent);
     clearFields();
     onClose();
+  };
+
+  const handleUpdateSelected = () => {
+    if (selectedComponent) {
+      let updatedComponent: TorneosData = selectedComponent;
+
+      // Configurar el componente según el tipo
+      if (tipo === "label") {
+        updatedComponent = {
+          ...updatedComponent,
+          texto: labelText,
+          estilo:
+            labelOption === "Titulo"
+              ? { fontSize: 22.0, fontWeight: "bold", color: "#000000" }
+              : labelOption === "Subtitulo"
+              ? {
+                  fontSize: 20.0,
+                  fontWeight: "bold",
+                  color: "#000000",
+                }
+              : labelOption === "Subtitulo2"
+              ? {
+                  fontSize: 17.0,
+                  fontWeight: "bold",
+                  color: "#000000",
+                  alineacion: "centro",
+                }
+              : {
+                  fontSize: 15.0,
+                  fontWeight: "normal",
+                  color: "#000000",
+                  alineacion: "centro",
+                },
+        };
+      } else if (tipo === "imagen") {
+        updatedComponent = {
+          ...updatedComponent,
+          url: image,
+          estilo: { width: 150, height: 150, borderRadius: 12 },
+        };
+      } else if (tipo === "label_link") {
+        updatedComponent = {
+          ...updatedComponent,
+          label: labelText,
+          url: urlLink,
+        };
+      } else if (tipo === "input") {
+        updatedComponent = {
+          ...updatedComponent,
+          id: inputId || "",
+          label: labelText || "",
+          inputType: (selectedInputOption?.value as string) || "",
+          requerido: isRequired,
+        };
+      } else if (tipo === "checkbox") {
+        updatedComponent = {
+          ...updatedComponent,
+          id: "acepta_terminos",
+          label: labelText,
+          requerido: true,
+        };
+      } else if (tipo === "button") {
+        updatedComponent = {
+          ...updatedComponent,
+          texto: labelText,
+          accion: { tipo: accion, ruta: urlAction },
+        };
+      } else if (tipo === "medio_pago") {
+        updatedComponent = {
+          ...updatedComponent,
+          mostrar_pago_bewins: mostrarPagoBewins,
+          mostrar_descuento_nomina: mostrarDescuentoNomina,
+          mostrar_pago_epayco: mostrarPagoEpayco,
+          max_bewins: maxBewins,
+          valor_unitario: valorUnitario,
+          valor_en_pesos: valorPesos,
+          consideraciones: labelText,
+          requerido: true,
+        };
+      } else if (tipo === "carousel") {
+        updatedComponent = {
+          ...updatedComponent,
+          imagenes: carouselImages
+            .filter((url) => url.trim() !== "")
+            .map((url) => ({ url })),
+        };
+      }
+      updateSelectedComponent(updatedComponent);
+      clearFields();
+      onClose();
+    }
   };
 
   // Actualizar una imagen específica en el carrusel
@@ -636,8 +748,11 @@ export const ComponentsPopUp = ({
       <div className="bg-white p-6 rounded-lg shadow-lg relative w-[500px]">
         {renderContent()}
         <div className="flex items-center justify-end mt-6">
-          <Button variant="primary" onClick={handleClick}>
-            Agregar
+          <Button
+            variant="primary"
+            onClick={selectedComponent ? handleUpdateSelected : handleClick}
+          >
+            {selectedComponent ? "Editar" : "Agregar"}
           </Button>
         </div>
       </div>
